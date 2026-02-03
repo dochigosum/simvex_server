@@ -2,7 +2,7 @@
 - 어떤 기능이 구현되었나요?
 
 ## Related Issue
-- 관련 이슈 번호: #
+- Closes #
 
 ## Scope
 - 포함 범위:

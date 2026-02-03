@@ -2,7 +2,7 @@
 - 어떤 문서가 업데이트되었나요?
 
 ## Related Issue
-- 관련 이슈 번호: #
+- Closes #
 
 ## Change Type
 - [ ] 신규 문서 작성
