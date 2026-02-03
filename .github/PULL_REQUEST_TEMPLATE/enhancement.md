@@ -2,7 +2,7 @@
 - 어떤 점이 개선되었나요?
 
 ## Related Issue
-- 관련 이슈 번호: #
+- Closes #
 
 ## Current vs Improved
 - 변경 전:
