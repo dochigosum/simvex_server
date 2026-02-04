@@ -1,6 +1,5 @@
 package dochigosum.simvex.global.feignclient.webhook;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -13,10 +12,10 @@ public class SendService {
 
     private final DiscordWebhookClient discordWebhookClient;
 
-    @Async // 비동기처리
-    public void sendDiscordAlert(Exception e, HttpServletRequest request) {
+    @Async("discordAsyncExecutor") // 비동기처리
+    public void sendDiscordAlert(Exception e, String method, String uri) {
         try {
-            String message = buildMessage(e, request);
+            String message = buildMessage(e, method, uri);
             discordWebhookClient.send(
                     new DiscordWebhookRequest(message)
             );
@@ -25,13 +24,13 @@ public class SendService {
         }
     }
 
-    public String buildMessage(Exception e, HttpServletRequest request) {
+    public String buildMessage(Exception e, String method, String uri) {
         String errorMessage = """
             ## Internal Server Error
             - Method: `%s`
             - URI: `%s`
             - %s
-            """.formatted(request.getMethod(), request.getRequestURI(), e.getMessage());
+            """.formatted(method, uri, e.getMessage());
 
         // 2000자 이상이면 자름
         if (errorMessage.length() > 2000) {
