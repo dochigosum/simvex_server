@@ -15,9 +15,12 @@ public class Member {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(length = 50, nullable = false, unique = true)
     private String email;
 
+    @Column(length = 255, nullable = false)
     private String password;
 
+    @Column(name = "email_verified", nullable = false)
     private boolean emailVerified;
 }
