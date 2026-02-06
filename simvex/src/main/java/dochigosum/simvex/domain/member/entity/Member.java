@@ -23,4 +23,12 @@ public class Member {
 
     @Column(name = "email_verified", nullable = false)
     private boolean emailVerified;
+
+    public static Member of(String email, String encodedPassword) {
+        return Member.builder()
+                .email(email)
+                .password(encodedPassword)
+                .emailVerified(false)
+                .build();
+    }
 }
