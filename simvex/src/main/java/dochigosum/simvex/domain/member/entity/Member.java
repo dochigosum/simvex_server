@@ -5,7 +5,7 @@ import lombok.*;
 
 @Entity
 @Table(
-        name = "member",
+        name = "MEMBER",
         uniqueConstraints = @UniqueConstraint(name = "uk_member_email", columnNames = "email")
 )
 @Getter
@@ -33,5 +33,9 @@ public class Member {
                 .password(encodedPassword)
                 .emailVerified(false)
                 .build();
+    }
+
+    public void verifyEmail() {
+        this.emailVerified = true;
     }
 }
