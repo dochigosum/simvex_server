@@ -60,7 +60,14 @@ public class JwtTokenProvider {
 
     public Authentication getAuthentication(String token) {
         Claims claims = parseClaims(token);
-        Long memberId = Long.parseLong(claims.getSubject());
+//        Long memberId = Long.parseLong(claims.getSubject());
+
+        Long memberId;
+        try {
+            memberId = Long.parseLong(claims.getSubject());
+        } catch (NumberFormatException e) {
+            throw new JwtException("잘못된 토큰 형식입니다", e);
+        }
 
         CustomUserDetails userDetails = customUserDetailsService.loadUserById(memberId);
 
