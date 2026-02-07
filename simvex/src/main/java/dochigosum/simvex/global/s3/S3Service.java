@@ -62,7 +62,7 @@ public class S3Service {
 
     // uploadProjectImg
     public String uploadProjectPreviewImg(String memberId, String projectName, String filePath) {
-        Path path = Paths.get(filePath);
+        Path path = Path.of("preview-file-path");
         if (!Files.exists(path)) {
             throw new IllegalArgumentException("파일이 존재하지 않습니다: " + filePath);
         }
@@ -70,29 +70,24 @@ public class S3Service {
         String fileName = path.getFileName().toString();
         String key = "project/" + memberId + "/" + projectName + "/" + fileName;
 
-        try {
-            // 기존 파일 삭제 (멱등적)
-            deleteObject(key);
+        // 기존 파일 삭제 (멱등적)
+        deleteObject(key);
 
-            // Content-Type 자동 감지
-            String contentType = Files.probeContentType(path);
+        // Content-Type 자동 감지
+        String contentType = "image/png";
 
-            // 새 파일 업로드
-            PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-                    .bucket(bucket)
-                    .key(key)
-                    .contentType(contentType)
-                    .build();
+// S3 PutObjectRequest 생성
+        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                .bucket(bucket)
+                .key(key)
+                .contentType(contentType)  // 항상 image/png
+                .build();
 
-            s3Client.putObject(putObjectRequest, RequestBody.fromFile(path));
-            log.info("S3 업로드 완료: bucket={}, key={}", bucket, key);
+        s3Client.putObject(putObjectRequest, RequestBody.fromFile(path));
+        log.info("S3 업로드 완료: bucket={}, key={}", bucket, key);
 
-            return getProjectImgUrl(memberId, projectName, fileName);
+        return getProjectImgUrl(memberId, projectName, fileName);
 
-        } catch (IOException e) {
-            log.error("S3 업로드 실패: key={}, error={}", key, e.getMessage());
-            throw new RuntimeException("파일 업로드 실패: " + e.getMessage(), e);
-        }
     }
 
     private void deleteObject(String key) {
