@@ -12,13 +12,25 @@ public class S3ReadService {
     @Value("${AWS_REGION}")
     private String region;
 
-    public String getGltfUrl(String folder,String fileName) {
+    public String getDrawingUrl(String drawing, String fileName) {
         return "https://" +
                 bucket +
                 ".s3." +
                 region +
-                ".amazonaws.com/" +
-                folder + "/" +
+                ".amazonaws.com/3d_asset/" +
+                drawing + "/" +
+                fileName;
+    }
+
+    /// project/{member_id}/{project_name}/저장할파일명
+    public String getProjectImgUrl(String memberId, String projectName, String fileName) {
+        return "https://" +
+                bucket +
+                ".s3." +
+                region +
+                ".amazonaws.com/project/" +
+                memberId + "/" +
+                projectName + "/" +
                 fileName;
     }
 }
