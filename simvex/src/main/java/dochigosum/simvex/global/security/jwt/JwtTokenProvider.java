@@ -36,16 +36,16 @@ public class JwtTokenProvider {
 
     public String generateAccessToken(Long memberId, String email) {
         Date now = new Date();
-        Date expiry = new Date(now.getTime() + properties.getAccessExpirationMs());
+        Date expiry = new Date(now.getTime() + properties.getAccessTokenExpiration());
 
         return Jwts.builder()
                 .setSubject(String.valueOf(memberId))
                 .setIssuedAt(now)
                 .setExpiration(expiry)
-//                .claim(CLAIM_TYPE, TOKEN_TYPE_ACCESS)
-//                .claim("email", email)
-//                .claim(CLAIM_AUTHORITIES, java.util.List.of("ROLE_USER"))
-//                .signWith(key, SignatureAlgorithm.HS256)
+                .claim(CLAIM_TYPE, TOKEN_TYPE_ACCESS)
+                .claim("email", email)
+                .claim(CLAIM_AUTHORITIES, java.util.List.of("ROLE_USER"))
+                .signWith(key)
                 .compact();
     }
 
