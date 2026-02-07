@@ -8,6 +8,7 @@ import dochigosum.simvex.domain.member.presentation.dto.LoginResponse;
 import dochigosum.simvex.domain.member.repository.MemberRepository;
 import dochigosum.simvex.global.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,17 +23,21 @@ public class AuthService {
 
     @Transactional
     public JoinResponse join(JoinRequest request) {
-        if (memberRepository.existsByEmail(request.email())) {
-            throw new IllegalArgumentException("이미 가입된 이메일입니다.");
-        }
+//        if (memberRepository.existsByEmail(request.email())) {
+//            throw new IllegalArgumentException("이미 가입된 이메일입니다.");
+//        }
 
         Member member = Member.of(
                 request.email(),
                 passwordEncoder.encode(request.password())
         );
 
-        Member saved = memberRepository.save(member);
-        return new JoinResponse(saved.getEmail());
+        try {
+            Member saved = memberRepository.save(member);
+            return new JoinResponse(saved.getEmail());
+        } catch (DataIntegrityViolationException e) {
+            throw new IllegalArgumentException("이미 가입된 이메일입니다.", e);
+        }
     }
 
     @Transactional(readOnly = true)
