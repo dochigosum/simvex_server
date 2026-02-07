@@ -26,9 +26,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(SimvexException.class)
     public ResponseEntity<ErrorResponse> handleSimvexException(SimvexException e, HttpServletRequest request) {
         var ec = e.getErrorCode();
+        String message = e.getMessage() != null ? e.getMessage() : ec.getMessage();
+
         return ResponseEntity
                 .status(ec.getStatus())
-                .body(ErrorResponse.of(ec, request.getRequestURI()));
+                .body(ErrorResponse.of(ec.getStatus(), ec.getCode(), message, request.getRequestURI()));
     }
 
     // @Valid 바인딩 실패 (validation starter를 추가했을 때 동작)
