@@ -62,7 +62,7 @@ public class S3Service {
 
     // uploadProjectImg
     public String uploadProjectPreviewImg(String memberId, String projectName, String filePath) {
-        Path path = Path.of("preview-file-path");
+        Path path = Paths.get(filePath);
         if (!Files.exists(path)) {
             throw new IllegalArgumentException("파일이 존재하지 않습니다: " + filePath);
         }
@@ -70,13 +70,12 @@ public class S3Service {
         String fileName = path.getFileName().toString();
         String key = "project/" + memberId + "/" + projectName + "/" + fileName;
 
-        // 기존 파일 삭제 (멱등적)
+        // 기존 파일 삭제
         deleteObject(key);
 
-        // Content-Type 자동 감지
         String contentType = "image/png";
 
-// S3 PutObjectRequest 생성
+
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                 .bucket(bucket)
                 .key(key)
@@ -101,5 +100,4 @@ public class S3Service {
             log.debug("S3 삭제 실패 : key={}, error={}", key, e.getMessage());
         }
     }
-
 }
