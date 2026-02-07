@@ -15,20 +15,23 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 @Component
-@RequiredArgsConstructor
 public class JwtTokenProvider {
 
     private final CustomUserDetailsService customUserDetailsService;
     private final JwtProperties properties;
-    private SecretKey key;
+    private final SecretKey key;
 
     public static final String CLAIM_TYPE = "type";
     public static final String TOKEN_TYPE_ACCESS = "ACCESS";
     public static final String CLAIM_AUTHORITIES = "authorities";
 
-    @PostConstruct
-    void init() {
-        this.key = Keys.hmacShaKeyFor(properties.getSecret().getBytes(StandardCharsets.UTF_8));
+    public JwtTokenProvider(CustomUserDetailsService customUserDetailsService,
+                            JwtProperties properties) {
+        this.customUserDetailsService = customUserDetailsService;
+        this.properties = properties;
+        this.key = Keys.hmacShaKeyFor(
+                properties.getSecret().getBytes(StandardCharsets.UTF_8)
+        );
     }
 
     public String generateAccessToken(Long memberId, String email) {
