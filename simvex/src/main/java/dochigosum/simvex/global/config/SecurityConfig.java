@@ -1,7 +1,6 @@
-package dochigosum.simvex.global.config;
+package dochigosum.simvex.global.security.jwt;
 
 import dochigosum.simvex.global.config.filter.JwtAuthenticationFilter;
-import dochigosum.simvex.global.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,6 +33,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/api/v1/auth/join",
+                                "/api/v1/auth/join/verify",
                                 "/api/v1/auth/login",
                                 "/error",
                                 "/swagger-ui/**",
