@@ -1,7 +1,6 @@
-package dochigosum.simvex.global.config.s3;
+package dochigosum.simvex.global.config;
 
 import io.awspring.cloud.autoconfigure.s3.S3ClientCustomizer;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import software.amazon.awssdk.auth.credentials.AnonymousCredentialsProvider;

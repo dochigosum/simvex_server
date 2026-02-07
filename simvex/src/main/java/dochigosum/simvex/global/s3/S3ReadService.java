@@ -1,4 +1,4 @@
-package dochigosum.simvex.global.config.s3;
+package dochigosum.simvex.global.s3;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
