@@ -4,7 +4,10 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "member")
+@Table(
+        name = "member",
+        uniqueConstraints = @UniqueConstraint(name = "uk_member_email", columnNames = "email")
+)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
