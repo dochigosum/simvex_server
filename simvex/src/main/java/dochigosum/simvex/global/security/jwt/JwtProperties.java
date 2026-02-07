@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "jwt")
 public class JwtProperties {
 
-    private String secret = "${jwt.secret}";
-
-    private long accessExpirationMs = Long.parseLong("${jwt.access-token-expiration}");
+    private String secret;
+    private long accessTokenExpiration;
 }
