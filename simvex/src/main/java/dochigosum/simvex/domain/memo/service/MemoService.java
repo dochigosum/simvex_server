@@ -2,10 +2,7 @@ package dochigosum.simvex.domain.memo.service;
 
 import dochigosum.simvex.domain.drawing.repository.DrawingRepository;
 import dochigosum.simvex.domain.memo.entity.Memo;
-import dochigosum.simvex.domain.memo.exception.DrawingNotFoundException;
-import dochigosum.simvex.domain.memo.exception.MemoBadRequestException;
 import dochigosum.simvex.domain.memo.exception.MemoErrorCode;
-import dochigosum.simvex.domain.memo.exception.MemoNotFoundException;
 import dochigosum.simvex.domain.memo.repository.MemoRepository;
 import dochigosum.simvex.global.error.GlobalErrorCode;
 import dochigosum.simvex.global.error.exception.SimvexException;
@@ -31,7 +28,7 @@ public class MemoService {
         }
 
         if (!drawingRepository.existsById(drawingId)) {
-            throw new DrawingNotFoundException(drawingId);
+            throw new SimvexException(MemoErrorCode.DRAWING_NOT_FOUND);
         }
 
         Memo memo = memoRepository.save(new Memo(drawingId, detail));
@@ -40,10 +37,10 @@ public class MemoService {
 
     public Memo get(Long memoId) {
         if (memoId == null) {
-            throw new MemoBadRequestException("memoId is required.");
+            throw new SimvexException(GlobalErrorCode.INVALID_REQUEST);
         }
         return memoRepository.findById(memoId)
-                .orElseThrow(() -> new MemoNotFoundException(memoId));
+                .orElseThrow(() -> new SimvexException(MemoErrorCode.MEMO_NOT_FOUND, "memoId=" + memoId));
     }
 
     @Transactional

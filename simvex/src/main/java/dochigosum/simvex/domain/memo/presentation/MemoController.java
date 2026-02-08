@@ -1,7 +1,6 @@
 package dochigosum.simvex.domain.memo.presentation;
 
 import dochigosum.simvex.domain.memo.entity.Memo;
-import dochigosum.simvex.domain.memo.exception.MemoErrorCode;
 import dochigosum.simvex.domain.memo.presentation.dto.MemoCreateRequest;
 import dochigosum.simvex.domain.memo.presentation.dto.MemoCreatedResponse;
 import dochigosum.simvex.domain.memo.presentation.dto.MemoResponse;
@@ -30,7 +29,7 @@ public class MemoController {
     @PostMapping
     public ResponseEntity<MemoCreatedResponse> create(@RequestBody MemoCreateRequest request) {
         if (request == null) {
-            throw new SimvexException(MemoErrorCode.MEMO_NOT_FOUND);
+            throw new SimvexException(GlobalErrorCode.INVALID_REQUEST);
         }
 
         Long createdId = memoService.create(request.drawingId(), request.detail());
