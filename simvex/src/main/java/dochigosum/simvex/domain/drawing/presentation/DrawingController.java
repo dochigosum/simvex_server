@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/drawings")
+@RequestMapping("/api/v1/drawing")
 @RequiredArgsConstructor
 public class DrawingController {
 
@@ -33,8 +33,6 @@ public class DrawingController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(drawingService.searchDrawing(search));
     }
-
-
 
 
     //조립도 선택
