@@ -2,6 +2,7 @@ package dochigosum.simvex.domain.coversation.service;
 
 import dochigosum.simvex.domain.coversation.entity.Conversation;
 import dochigosum.simvex.domain.coversation.repository.ConversationRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +19,7 @@ public class ConversationService {
         return conversation.getMessage();
     }
 
+    @Transactional
     public String retouchMessage(Long conversationId, String message) { //conversationId를 이후에 drawingId로 교체
         Conversation conversation = conversationRepository.findById(conversationId)
                 .orElseThrow(() -> new RuntimeException("conversation not found"));

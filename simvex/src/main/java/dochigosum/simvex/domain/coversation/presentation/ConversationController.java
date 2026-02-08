@@ -17,13 +17,13 @@ public class ConversationController {
 
     @GetMapping("/summary")
     public ResponseEntity<?> getAllConversations(@RequestParam Long id) { //현재는 conversationId 인데, 이후에 drawingId로 변경
-        return ResponseEntity.status(HttpStatus.CREATED)
+        return ResponseEntity.status(HttpStatus.OK)
                 .body(conversationService.getMessage(id));
     }
 
     @PutMapping("/summary")
     public ResponseEntity<?> updateConversation(@RequestParam Long id, @RequestParam String message) {
-        return ResponseEntity.status(HttpStatus.CREATED)
+        return ResponseEntity.status(HttpStatus.OK)
                 .body(conversationService.retouchMessage(id, message));
     }
 }
