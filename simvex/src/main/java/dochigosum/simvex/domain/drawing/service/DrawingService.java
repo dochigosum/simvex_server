@@ -70,7 +70,7 @@ public class DrawingService {
     // 조립도 설명
     public DrawingExplainResponseDTO drawingExplain(Long drawingId) {
         Drawing drawing = drawingRepository.findById(drawingId)
-                .orElseThrow(() -> new SimvexException(GlobalErrorCode.NOT_FOUND, "Drawing not found")););
+                .orElseThrow(() -> new SimvexException(GlobalErrorCode.NOT_FOUND, "Drawing not found"));
         return DrawingExplainResponseDTO.from(drawing.getDetail());
     }
 
