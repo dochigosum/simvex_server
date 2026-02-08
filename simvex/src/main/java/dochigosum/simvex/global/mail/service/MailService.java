@@ -1,5 +1,7 @@
 package dochigosum.simvex.global.mail.service;
 
+import dochigosum.simvex.global.error.GlobalErrorCode;
+import dochigosum.simvex.global.error.exception.SimvexException;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -45,7 +47,7 @@ public class MailService {
 
             javaMailSender.send(message);
         } catch (MessagingException | MailException e) {
-            throw new IllegalStateException("이메일 전송에 실패했습니다.", e);
+            throw new SimvexException(GlobalErrorCode.INTERNAL_SERVER_ERROR, "이메일 전송에 실패했습니다.");
         }
     }
 }

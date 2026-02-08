@@ -1,10 +1,12 @@
 package dochigosum.simvex.domain.member.service;
 
 import dochigosum.simvex.domain.member.entity.Member;
+import dochigosum.simvex.domain.member.exception.MemberErrorCode;
 import dochigosum.simvex.domain.member.presentation.dto.*;
 import dochigosum.simvex.domain.member.repository.MemberRepository;
 import dochigosum.simvex.domain.memberverifications.entity.MemberVerification;
 import dochigosum.simvex.domain.memberverifications.repository.MemberVerificationRepository;
+import dochigosum.simvex.global.error.exception.SimvexException;
 import dochigosum.simvex.global.mail.service.MailService;
 import dochigosum.simvex.global.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -53,21 +55,22 @@ public class AuthService {
 
             return new JoinResponse(saved.getEmail());
         } catch (DataIntegrityViolationException e) {
-            throw new IllegalArgumentException("이미 가입된 이메일입니다.", e);
+            throw new SimvexException(MemberErrorCode.EMAIL_ALREADY_EXISTS);
+
         }
     }
 
     @Transactional(readOnly = true)
     public LoginResponse login(LoginRequest request) {
         Member member = memberRepository.findByEmail(request.email())
-                .orElseThrow(() -> new IllegalArgumentException("이메일 또는 비밀번호가 올바르지 않습니다."));
+                .orElseThrow(() -> new SimvexException(MemberErrorCode.INVALID_CREDENTIALS));
 
         if (!passwordEncoder.matches(request.password(), member.getPassword())) {
-            throw new IllegalArgumentException("이메일 또는 비밀번호가 올바르지 않습니다.");
+            throw new SimvexException(MemberErrorCode.INVALID_CREDENTIALS);
         }
 
         if (!member.isEmailVerified()) {
-            throw new IllegalArgumentException("이메일 인증이 필요합니다.");
+            throw new SimvexException(MemberErrorCode.EMAIL_NOT_VERIFIED);
         }
 
         String accessToken = jwtTokenProvider.generateAccessToken(member.getId(), member.getEmail());
@@ -77,21 +80,21 @@ public class AuthService {
     @Transactional
     public VerifyEmailResponse verifyEmail(VerifyEmailRequest request) {
         Member member = memberRepository.findByEmail(request.email())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 이메일입니다."));
+                .orElseThrow(() -> new SimvexException(MemberErrorCode.MEMBER_NOT_FOUND));
 
         if (member.isEmailVerified()) {
             return new VerifyEmailResponse(member.getEmail(), true);
         }
 
         MemberVerification verification = memberVerificationRepository.findTopByMemberOrderByIdDesc(member)
-                .orElseThrow(() -> new IllegalArgumentException("인증 코드가 존재하지 않습니다. 다시 요청해 주세요."));
+                .orElseThrow(() -> new SimvexException(MemberErrorCode.VERIFICATION_CODE_NOT_FOUND));
 
         if (!verification.getCode().equals(request.code())) {
-            throw new IllegalArgumentException("인증 코드가 올바르지 않습니다.");
+            throw new SimvexException(MemberErrorCode.INVALID_VERIFICATION_CODE);
         }
 
         if (verification.getExpiresAt().isBefore(LocalDateTime.now())) {
-            throw new IllegalArgumentException("인증 코드가 만료되었습니다. 다시 요청해 주세요.");
+            throw new SimvexException(MemberErrorCode.VERIFICATION_CODE_EXPIRED);
         }
 
         member.verifyEmail();
