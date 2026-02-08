@@ -29,7 +29,7 @@ public class DrawingController {
     // todo drawingTemplateId 명시후, 이후에 개발
     //조립도 검색 /search?query={} -> 검색결과 + 미리보기 이미지 띄움
     @GetMapping("/search")
-    public ResponseEntity<?> searchDrawing(@RequestParam String search) {
+    public ResponseEntity<?> searchDrawing(@RequestParam(name = "query") String search) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(drawingService.searchDrawing(search));
     }
