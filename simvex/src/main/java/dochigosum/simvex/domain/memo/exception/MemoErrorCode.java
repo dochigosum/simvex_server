@@ -8,8 +8,8 @@ public enum MemoErrorCode implements ErrorCode {
     INVALID_REQUEST(HttpStatus.BAD_REQUEST, "MEM_400", "잘못된 요청입니다."),
 
     // 404
-    MEMO_NOT_FOUND(HttpStatus.NOT_FOUND, "MEM_404", "메모를 찾을 수 없습니다."),
-    DRAWING_NOT_FOUND(HttpStatus.NOT_FOUND, "MEM_404", "드로잉을 찾을 수 없습니다.");
+    MEMO_NOT_FOUND(HttpStatus.NOT_FOUND, "MEM_404_01", "메모를 찾을 수 없습니다."),
+    DRAWING_NOT_FOUND(HttpStatus.NOT_FOUND, "MEM_404_02", "드로잉을 찾을 수 없습니다.");
 
     private final HttpStatus status;
     private final String code;
