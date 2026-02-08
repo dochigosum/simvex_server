@@ -16,12 +16,13 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.util.stream.Collectors;
 
 @Slf4j
 @RestControllerAdvice
-public class GlobalExceptionHandler {
+public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(SimvexException.class)
     public ResponseEntity<ErrorResponse> handleSimvexException(SimvexException e, HttpServletRequest request) {
