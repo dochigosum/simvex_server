@@ -13,39 +13,32 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ProjectService {
 
     private final ProjectRepository projectRepository;
 
     @Transactional
     public ProjectResponse createProject(ProjectCreateRequest request) {
-        try {
-            Project project = Project.builder()
-                    .userId(request.userId())
-                    .name(request.name())
-                    .previewImgUrl(request.previewImgUrl())
-                    .build();
+        Project project = Project.builder()
+                .userId(request.userId())
+                .name(request.name())
+                .previewImgUrl(request.previewImgUrl())
+                .build();
 
-            Project savedProject = projectRepository.save(project);
-            log.info("프로젝트 생성 완료. ID: {}", savedProject.getId());
-
-            return ProjectResponse.from(savedProject);
-        } catch (Exception e) {
-            log.error("프로젝트 생성 실패", e);
-            throw new ProjectCreationException("프로젝트 생성에 실패했습니다.", e);
-        }
+        Project savedProject = projectRepository.save(project);
+        return ProjectResponse.from(savedProject);
     }
 
-    @Transactional(readOnly = true)
     public ProjectListResponse getProjectsByUserId(Long userId) {
         List<Project> projects = projectRepository.findByUserId(userId);
-        List<ProjectResponse> responses = projects.stream()
+
+        List<ProjectResponse> projectResponses = projects.stream()
                 .map(ProjectResponse::from)
                 .toList();
 
-        return ProjectListResponse.from(responses);
+        return ProjectListResponse.from(projectResponses);
     }
 }

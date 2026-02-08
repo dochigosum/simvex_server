@@ -38,11 +38,5 @@ public class Project {
         this.userId = userId;
         this.name = name;
         this.previewImgUrl = previewImgUrl;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
-    }
-
-    public void updateMetadata() {
-        this.updatedAt = LocalDateTime.now();
     }
 }
