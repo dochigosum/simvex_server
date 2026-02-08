@@ -20,7 +20,7 @@ public class DrawingController {
     private final DrawingService drawingService;
 
     //조립도 목록 조회
-    @GetMapping("/")
+    @GetMapping
     public ResponseEntity<ViewDrawingsResponseDTO<List<DrawingData>>> getDrawingList(){
         return ResponseEntity.status(HttpStatus.OK)
                 .body(drawingService.getDrawingList());
