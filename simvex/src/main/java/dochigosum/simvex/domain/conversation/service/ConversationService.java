@@ -1,7 +1,7 @@
-package dochigosum.simvex.domain.coversation.service;
+package dochigosum.simvex.domain.conversation.service;
 
-import dochigosum.simvex.domain.coversation.entity.Conversation;
-import dochigosum.simvex.domain.coversation.repository.ConversationRepository;
+import dochigosum.simvex.domain.conversation.entity.Conversation;
+import dochigosum.simvex.domain.conversation.repository.ConversationRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

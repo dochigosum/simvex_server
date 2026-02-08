@@ -1,7 +1,6 @@
-package dochigosum.simvex.domain.coversation.entity;
+package dochigosum.simvex.domain.conversation.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -1,12 +1,10 @@
-package dochigosum.simvex.domain.coversation.presentation;
+package dochigosum.simvex.domain.conversation.presentation;
 
-import dochigosum.simvex.domain.coversation.service.ConversationService;
+import dochigosum.simvex.domain.conversation.service.ConversationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import javax.net.ssl.HttpsURLConnection;
 
 @RestController
 @RequiredArgsConstructor
