@@ -1,4 +1,4 @@
-package dochigosum.simvex.global.config.filter;
+package dochigosum.simvex.global.security.filter;
 
 import dochigosum.simvex.global.security.jwt.JwtTokenProvider;
 import jakarta.servlet.FilterChain;
