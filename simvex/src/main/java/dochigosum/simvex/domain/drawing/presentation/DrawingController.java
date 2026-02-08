@@ -57,7 +57,7 @@ public class DrawingController {
     //조립도 전체 저장 /{drawing_id}
 //    @PutMapping("/{drawing_id}")
 //    public ResponseEntity<?> saveParts(
-//            @PathVariable("draawing_id") Long drawingId,
+//            @PathVariable("drawing_id") Long drawingId,
 //            @RequestBody DrawingPartsRequestDTO<DrawingPartsData> data) {
 //        return ResponseEntity.status(HttpStatus.OK)
 //                .body(drawingService.updateDrawingParts(drawingId, data));
