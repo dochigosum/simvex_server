@@ -4,10 +4,8 @@ import dochigosum.simvex.domain.project.presentation.dto.request.ProjectCreateRe
 import dochigosum.simvex.domain.project.presentation.dto.response.ProjectResponse;
 import dochigosum.simvex.domain.project.presentation.dto.response.ProjectListResponse;
 import dochigosum.simvex.domain.project.entity.Project;
-import dochigosum.simvex.domain.project.exception.ProjectCreationException;
 import dochigosum.simvex.domain.project.repository.ProjectRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,7 +13,6 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class ProjectService {
 
     private final ProjectRepository projectRepository;
@@ -32,13 +29,13 @@ public class ProjectService {
         return ProjectResponse.from(savedProject);
     }
 
+    @Transactional(readOnly = true)
     public ProjectListResponse getProjectsByUserId(Long userId) {
         List<Project> projects = projectRepository.findByUserId(userId);
-
-        List<ProjectResponse> projectResponses = projects.stream()
+        List<ProjectResponse> responses = projects.stream()
                 .map(ProjectResponse::from)
                 .toList();
 
-        return ProjectListResponse.from(projectResponses);
+        return ProjectListResponse.from(responses);
     }
 }

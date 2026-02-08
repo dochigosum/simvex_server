@@ -2,8 +2,6 @@ package dochigosum.simvex.domain.project.presentation.dto.response;
 
 import dochigosum.simvex.domain.project.entity.Project;
 
-import java.time.LocalDateTime;
-
 public record ProjectResponse(
         Long id,
         Long userId,
