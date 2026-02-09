@@ -1,6 +1,6 @@
 package dochigosum.simvex.global.config;
 
-import dochigosum.simvex.global.config.filter.JwtAuthenticationFilter;
+import dochigosum.simvex.global.security.filter.JwtAuthenticationFilter;
 import dochigosum.simvex.global.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
