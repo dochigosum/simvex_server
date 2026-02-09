@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping("/api/v1/projects")
+@RequestMapping("/api/v1/project")
 @RequiredArgsConstructor
 public class ProjectController {
 
