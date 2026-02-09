@@ -16,13 +16,13 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class TemplateService {
 
     private final DrawingTemplateRepository drRepo;
     private final PartTemplateRepository partRepo;
 
     // 조립도 목록 조회
-    @Transactional(readOnly = true)
     public List<DrawingListResponse> getDrawings() {
         return drRepo.findAll()
                 .stream()
@@ -31,7 +31,6 @@ public class TemplateService {
     }
 
     // 조립도 검색
-    @Transactional(readOnly = true)
     public List<DrawingSearchResponse> searchDrawings(String query) {
 
         if (query == null || query.isBlank()) {
@@ -50,7 +49,6 @@ public class TemplateService {
     }
 
     // 조립도 별 부품 목록 조회
-    @Transactional(readOnly = true)
     public List<PartListResponse> getParts(Long id) {
         return partRepo.findAllByDrawingTemplate_Id(id)
                 .stream()

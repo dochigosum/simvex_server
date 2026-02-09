@@ -1,9 +1,9 @@
-package dochigosum.simvex.domain.memo.service;
+package dochigosum.simvex.domain.drawing.service;
 
 import dochigosum.simvex.domain.drawing.repository.DrawingRepository;
-import dochigosum.simvex.domain.memo.entity.Memo;
-import dochigosum.simvex.domain.memo.exception.MemoErrorCode;
-import dochigosum.simvex.domain.memo.repository.MemoRepository;
+import dochigosum.simvex.domain.drawing.entity.Memo;
+import dochigosum.simvex.domain.drawing.exception.MemoErrorCode;
+import dochigosum.simvex.domain.drawing.repository.MemoRepository;
 import dochigosum.simvex.global.error.GlobalErrorCode;
 import dochigosum.simvex.global.error.exception.SimvexException;
 import lombok.RequiredArgsConstructor;
@@ -20,10 +20,8 @@ public class MemoService {
 
     @Transactional
     public Long create(Long drawingId, String detail) {
-        if (drawingId == null) {
-            throw new SimvexException(GlobalErrorCode.INVALID_REQUEST);
-        }
-        if (detail == null || detail.trim().isEmpty()) {
+
+        if (drawingId == null || detail == null || detail.trim().isEmpty()) {
             throw new SimvexException(GlobalErrorCode.INVALID_REQUEST);
         }
 
@@ -39,6 +37,7 @@ public class MemoService {
         if (memoId == null) {
             throw new SimvexException(GlobalErrorCode.INVALID_REQUEST);
         }
+
         return memoRepository.findById(memoId)
                 .orElseThrow(() -> new SimvexException(MemoErrorCode.MEMO_NOT_FOUND, "memoId=" + memoId));
     }

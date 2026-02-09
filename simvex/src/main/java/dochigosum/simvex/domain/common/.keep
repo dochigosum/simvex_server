@@ -1,5 +1,3 @@
 @Embeddable attribute 정의
 - CoordinateAttribute
 - RotationAttribute
-- PartAttribute
-- DrawingAttribute

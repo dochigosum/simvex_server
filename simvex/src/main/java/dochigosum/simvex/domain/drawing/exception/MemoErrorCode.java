@@ -1,4 +1,4 @@
-package dochigosum.simvex.domain.memo.exception;
+package dochigosum.simvex.domain.drawing.exception;
 
 import dochigosum.simvex.global.error.ErrorCode;
 import org.springframework.http.HttpStatus;

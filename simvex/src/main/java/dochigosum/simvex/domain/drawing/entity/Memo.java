@@ -1,4 +1,4 @@
-package dochigosum.simvex.domain.memo.entity;
+package dochigosum.simvex.domain.drawing.entity;
 
 import dochigosum.simvex.domain.drawing.entity.Drawing;
 
@@ -20,9 +20,6 @@ public class Memo {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "drawing_id", nullable = false)
     private Drawing drawing;
-
-//    @Column(name = "drawing_id", nullable = false)
-//    private Long drawingId;
 
     @Column(length = 2000, nullable = false)
     private String detail;
