@@ -15,8 +15,8 @@ public enum GlobalErrorCode implements ErrorCode {
 
     // 404
     NOT_FOUND(HttpStatus.NOT_FOUND, "GLB_404", "리소스를 찾을 수 없습니다."),
-    PROJECT_NOT_FOUND(HttpStatus.NOT_FOUND, "GLB_404", "프로젝트를 잧을 수 없습니다."),
-    PROJECT_DELETE_FAILED(HttpStatus.NOT_FOUND, "GLB_404", "프로젝트를 삭제에 실패했습니다."),
+    PROJECT_NOT_FOUND(HttpStatus.NOT_FOUND, "GLB_404", "프로젝트를 찾을 수 없습니다."),
+    PROJECT_DELETE_FAILED(HttpStatus.NOT_FOUND, "GLB_404", "프로젝트 삭제에 실패했습니다."),
     PART_NOT_FOUND(HttpStatus.NOT_FOUND, "GLB_404", "부품을 찾을 수 없습니다."),
 
     // 409

@@ -61,7 +61,7 @@ public class ProjectService {
         return ProjectDetailResponse.from(project);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public ProjectDetailResponse renameProject(
             String currentName,
             ProjectRenameRequest request
