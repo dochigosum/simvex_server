@@ -10,12 +10,16 @@ public enum GlobalErrorCode implements ErrorCode {
     // 401/403
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "GLB_401", "인증이 필요합니다."),
     FORBIDDEN(HttpStatus.FORBIDDEN, "GLB_403", "권한이 없습니다."),
+    PROJECT_ACCESS_DENIED(HttpStatus.FORBIDDEN, "GLB_403", "프로젝트 접근 권한이 없습니다."),
 
     // 404
     NOT_FOUND(HttpStatus.NOT_FOUND, "GLB_404", "리소스를 찾을 수 없습니다."),
+    PROJECT_NOT_FOUND(HttpStatus.NOT_FOUND, "GLB_404", "프로젝트를 잧을 수 없습니다."),
+    PROJECT_DELETE_FAILED(HttpStatus.NOT_FOUND, "GLB_404", "프로젝트를 삭제에 실패했습니다."),
 
     // 409
     CONFLICT(HttpStatus.CONFLICT, "GLB_409", "요청이 충돌했습니다."),
+    PROJECT_NAME_DUPLICATE(HttpStatus.CONFLICT, "GLB_409", "이미 존재하는 프로젝트 이름입니다."),
 
     // 500
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "GLB_500", "서버 오류가 발생했습니다.");

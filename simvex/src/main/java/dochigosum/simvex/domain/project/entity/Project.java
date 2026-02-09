@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "PROJECT")
+@Table(name = "project")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Project {
@@ -38,5 +38,11 @@ public class Project {
         this.userId = userId;
         this.name = name;
         this.previewImgUrl = previewImgUrl;
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+    public void rename(String newName) {
+        this.name = newName;
+        this.updatedAt = LocalDateTime.now();
     }
 }
