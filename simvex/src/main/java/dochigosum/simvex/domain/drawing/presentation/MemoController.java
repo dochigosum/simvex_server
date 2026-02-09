@@ -1,10 +1,10 @@
-package dochigosum.simvex.domain.memo.presentation;
+package dochigosum.simvex.domain.drawing.presentation;
 
-import dochigosum.simvex.domain.memo.entity.Memo;
-import dochigosum.simvex.domain.memo.presentation.dto.MemoCreateRequest;
-import dochigosum.simvex.domain.memo.presentation.dto.MemoCreatedResponse;
-import dochigosum.simvex.domain.memo.presentation.dto.MemoResponse;
-import dochigosum.simvex.domain.memo.service.MemoService;
+import dochigosum.simvex.domain.drawing.entity.Memo;
+import dochigosum.simvex.domain.drawing.presentation.dto.request.MemoCreateRequest;
+import dochigosum.simvex.domain.drawing.presentation.dto.response.MemoCreatedResponse;
+import dochigosum.simvex.domain.drawing.presentation.dto.response.MemoResponse;
+import dochigosum.simvex.domain.drawing.service.MemoService;
 import dochigosum.simvex.global.error.GlobalErrorCode;
 
 import dochigosum.simvex.global.error.exception.SimvexException;

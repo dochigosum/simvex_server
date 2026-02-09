@@ -1,6 +1,6 @@
-package dochigosum.simvex.domain.memo.presentation.dto;
+package dochigosum.simvex.domain.drawing.presentation.dto.response;
 
-import dochigosum.simvex.domain.memo.entity.Memo;
+import dochigosum.simvex.domain.drawing.entity.Memo;
 
 public record MemoResponse(
         Long memoId,
