@@ -1,11 +1,26 @@
 package dochigosum.simvex.domain.project.exception;
 
-// 도메인 공통 예외
+import dochigosum.simvex.global.error.GlobalErrorCode;
+
 public class ProjectException extends RuntimeException {
-    public ProjectException(String message) {
-        super(message);
+
+    private final GlobalErrorCode errorCode;
+
+    public ProjectException(GlobalErrorCode errorCode) {
+        super(errorCode.getMessage());
+        this.errorCode = errorCode;
     }
-    public ProjectException(String message, Throwable cause) {
-        super(message, cause);
+
+    public ProjectException(GlobalErrorCode errorCode, String detail) {
+        super(errorCode.getMessage() + ": " + detail);
+        this.errorCode = errorCode;
+    }
+
+    public GlobalErrorCode getErrorCode() {
+        return errorCode;
+    }
+
+    public int getStatusCode() {  // @Override 제거
+        return errorCode.getStatus().value();
     }
 }

@@ -24,14 +24,6 @@ public class ProjectController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @GetMapping
-    public ResponseEntity<ProjectListResponse> getProjects(
-            @RequestParam Long userId
-    ) {
-        ProjectListResponse response = projectService.getProjectsByUserId(userId);
-        return ResponseEntity.ok(response);
-    }
-
     @GetMapping("/{projectId}")
     public ResponseEntity<ProjectDetailResponse> getProjectDetail(
             @PathVariable Long projectId

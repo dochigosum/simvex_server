@@ -1,11 +1,11 @@
 package dochigosum.simvex.domain.project.service;
 
-import dochigosum.simvex.domain.project.exception.ProjectNameDuplicateException;
-import dochigosum.simvex.domain.project.exception.ProjectNotFoundException;
 import dochigosum.simvex.domain.project.presentation.dto.request.*;
 import dochigosum.simvex.domain.project.presentation.dto.response.*;
 import dochigosum.simvex.domain.project.entity.Project;
 import dochigosum.simvex.domain.project.repository.ProjectRepository;
+import dochigosum.simvex.global.error.GlobalErrorCode;
+import dochigosum.simvex.global.error.exception.SimvexException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +20,8 @@ public class ProjectService {
 
     @Transactional
     public ProjectResponse createProject(ProjectCreateRequest request) {
+        validateProjectNameNotDuplicate(request.name());
+
         Project project = Project.builder()
                 .userId(request.userId())
                 .name(request.name())
@@ -30,14 +32,14 @@ public class ProjectService {
         return ProjectResponse.from(savedProject);
     }
 
-    @Transactional(readOnly = true)
     public ProjectListResponse getProjectsByUserId(Long userId) {
         List<Project> projects = projectRepository.findByUserId(userId);
-        List<ProjectResponse> responses = projects.stream()
+
+        List<ProjectResponse> projectResponses = projects.stream()
                 .map(ProjectResponse::from)
                 .toList();
 
-        return ProjectListResponse.from(responses);
+        return ProjectListResponse.from(projectResponses);
     }
 
     public ProjectDetailResponse getProjectDetailById(Long projectId) {
@@ -45,8 +47,8 @@ public class ProjectService {
         return ProjectDetailResponse.from(project);
     }
 
-    public ProjectDetailResponse getProjectDetailByName(String projectName) {
-        Project project = findProjectByName(projectName);
+    public ProjectDetailResponse getProjectDetailByName(String project_name) {
+        Project project = findProjectByName(project_name);
         return ProjectDetailResponse.from(project);
     }
 
@@ -63,26 +65,34 @@ public class ProjectService {
     }
 
     @Transactional
-    public ProjectDeleteResponse deleteProject(String projectName) {
-        Project project = findProjectByName(projectName);
+    public ProjectDeleteResponse deleteProject(String project_name) {
+        Project project = findProjectByName(project_name);
         projectRepository.delete(project);
-        return ProjectDeleteResponse.of(projectName);
+        return ProjectDeleteResponse.of(project_name);
     }
 
     private Project findProjectById(Long projectId) {
         return projectRepository.findById(projectId)
-                .orElseThrow(() -> new ProjectNotFoundException(
-                        "ID: " + projectId));
+                .orElseThrow(() -> new SimvexException(
+                        GlobalErrorCode.PROJECT_NOT_FOUND,
+                        "ID: " + projectId
+                ));
     }
 
-    private Project findProjectByName(String projectName) {
-        return projectRepository.findByName(projectName)
-                .orElseThrow(() -> new ProjectNotFoundException(projectName));
+    private Project findProjectByName(String project_name) {
+        return projectRepository.findByName(project_name)
+                .orElseThrow(() -> new SimvexException(
+                        GlobalErrorCode.PROJECT_NOT_FOUND,
+                        project_name
+                ));
     }
 
-    private void validateProjectNameNotDuplicate(String projectName) {
-        if (projectRepository.existsByName(projectName)) {
-            throw new ProjectNameDuplicateException(projectName);
+    private void validateProjectNameNotDuplicate(String project_name) {
+        if (projectRepository.existsByName(project_name)) {
+            throw new SimvexException(
+                    GlobalErrorCode.PROJECT_NAME_DUPLICATE,
+                    project_name
+            );
         }
     }
 }
