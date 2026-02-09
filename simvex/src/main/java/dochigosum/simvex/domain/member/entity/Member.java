@@ -34,4 +34,8 @@ public class Member {
                 .emailVerified(false)
                 .build();
     }
+
+    public void verifyEmail() {
+        this.emailVerified = true;
+    }
 }

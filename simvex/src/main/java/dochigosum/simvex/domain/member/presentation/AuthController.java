@@ -1,9 +1,6 @@
 package dochigosum.simvex.domain.member.presentation;
 
-import dochigosum.simvex.domain.member.presentation.dto.JoinRequest;
-import dochigosum.simvex.domain.member.presentation.dto.JoinResponse;
-import dochigosum.simvex.domain.member.presentation.dto.LoginRequest;
-import dochigosum.simvex.domain.member.presentation.dto.LoginResponse;
+import dochigosum.simvex.domain.member.presentation.dto.*;
 import dochigosum.simvex.domain.member.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,5 +22,10 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(authService.login(request));
+    }
+
+    @PostMapping("/join/verify")
+    public ResponseEntity<VerifyEmailResponse> verifyEmail(@Valid @RequestBody VerifyEmailRequest request) {
+        return ResponseEntity.ok(authService.verifyEmail(request));
     }
 }
