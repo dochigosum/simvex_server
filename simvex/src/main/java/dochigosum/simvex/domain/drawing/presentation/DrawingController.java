@@ -1,9 +1,13 @@
 package dochigosum.simvex.domain.drawing.presentation;
 
+import dochigosum.simvex.domain.drawing.presentation.dto.request.DrawingAssetRequest;
+import dochigosum.simvex.domain.drawing.presentation.dto.response.DrawingAssetResponse;
 import dochigosum.simvex.domain.drawing.presentation.dto.response.*;
 import dochigosum.simvex.domain.drawing.service.DrawingService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -39,6 +43,20 @@ public class DrawingController {
     @GetMapping("/part/{partId}/model")
     public ResponseEntity<PartModelUrlResponse> getPartModel(@PathVariable Long partId) {
         return ResponseEntity.ok(drawingService.getModelUrl(partId));
+    }
+
+    @PostMapping("/part/asset")
+    public ResponseEntity<List<DrawingAssetResponse>> getHomeAssets(
+            @RequestBody DrawingAssetRequest request) {
+        return ResponseEntity.ok(drawingService.getDrawingAssets(request.drawingTemplateId()));
+    }
+
+    @PostMapping("/template/select")
+    public ResponseEntity<Void> selectDrawingTemplate(
+            @RequestBody DrawingAssetRequest request,
+            @AuthenticationPrincipal Long userId) {
+        drawingService.createDrawingSession(request.drawingTemplateId(), userId);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }
 

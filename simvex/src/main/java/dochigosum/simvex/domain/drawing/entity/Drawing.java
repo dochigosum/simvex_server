@@ -2,17 +2,17 @@ package dochigosum.simvex.domain.drawing.entity;
 
 import dochigosum.simvex.domain.member.entity.Member;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@AllArgsConstructor
-@NoArgsConstructor
+@Table(name = "drawing")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
+@Builder
 public class Drawing {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,7 +23,6 @@ public class Drawing {
     @JoinColumn(name = "member_id")
     private Member member;
 
-
     @Column(nullable = false, length=50)
     private String name;
 
@@ -33,6 +32,10 @@ public class Drawing {
     @OneToMany(mappedBy = "drawing", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DrawingPart> parts = new ArrayList<>();
 
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "conversation_id")
+    private Conversation conversation;
+
     public void addPart(DrawingPart part) {
         parts.add(part);
         part.setDrawing(this);
@@ -41,5 +44,9 @@ public class Drawing {
     public void removePart(DrawingPart part) {
         parts.remove(part);
         part.setDrawing(null);
+    }
+
+    public void updateConversation(Conversation conversation) {
+        this.conversation = conversation;
     }
 }

@@ -1,11 +1,16 @@
 package dochigosum.simvex.domain.drawing.service;
 
+import dochigosum.simvex.domain.drawing.entity.Conversation;
 import dochigosum.simvex.domain.drawing.entity.Drawing;
 import dochigosum.simvex.domain.drawing.entity.DrawingPart;
 import dochigosum.simvex.domain.drawing.exception.DrawingErrorCode;
+import dochigosum.simvex.domain.drawing.presentation.dto.response.DrawingAssetResponse;
 import dochigosum.simvex.domain.drawing.presentation.dto.response.*;
+import dochigosum.simvex.domain.drawing.repository.ConversationRepository;
 import dochigosum.simvex.domain.drawing.repository.DrawingPartRepository;
 import dochigosum.simvex.domain.drawing.repository.DrawingRepository;
+import dochigosum.simvex.domain.member.entity.Member;
+import dochigosum.simvex.domain.member.repository.MemberRepository;
 import dochigosum.simvex.global.error.exception.SimvexException;
 import dochigosum.simvex.global.s3.S3Service;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +26,8 @@ public class DrawingService {
 
     private final DrawingRepository drawingRepository;
     private final DrawingPartRepository drawingPartRepository;
+    private final MemberRepository memberRepository;
+    private final ConversationRepository conversationRepository;
     private final S3Service s3Service;
 
     // 조립도 정보 반환
@@ -62,5 +68,42 @@ public class DrawingService {
         DrawingPart part = drawingPartRepository.findById(partId)
                 .orElseThrow(() -> new SimvexException(DrawingErrorCode.NOT_FOUND));
         return PartModelUrlResponse.of(s3Service.getDrawingUrl(part.getDrawing().getName(), part.getFileName()));
+    }
+
+    @Transactional
+    public List<DrawingAssetResponse> getDrawingAssets(Long drawingId) {
+        Drawing drawing = drawingRepository.findById(drawingId)
+                .orElseThrow(() -> new SimvexException(DrawingErrorCode.NOT_FOUND));
+
+        List<DrawingPart> parts = drawingPartRepository.findAllByDrawing_Id(drawingId);
+
+        return parts.stream()
+                .map(part -> {
+                    String url = s3Service.getDrawingUrl(drawing.getName(), part.getFileName());
+                    return DrawingAssetResponse.of(part, url);
+                })
+                .toList();
+    }
+
+    @Transactional
+    public void createDrawingSession(Long templateId, Long userId) {
+        DrawingTemplate template = drawingTemplateRepository.findById(templateId)
+                .orElseThrow(() -> new SimvexException(DrawingErrorCode.NOT_FOUND));
+
+        Member member = memberRepository.getReferenceById(userId);
+
+        Drawing newDrawing = Drawing.builder()
+                .member(member)
+                .name(template.getName())
+                .previewImgUrl(template.getPreviewImgUrl())
+                .build();
+
+        Drawing savedDrawing = drawingRepository.save(newDrawing);
+
+        Conversation conversation = Conversation.builder()
+                .drawing(savedDrawing)
+                .build();
+
+        conversationRepository.save(conversation);
     }
 }
