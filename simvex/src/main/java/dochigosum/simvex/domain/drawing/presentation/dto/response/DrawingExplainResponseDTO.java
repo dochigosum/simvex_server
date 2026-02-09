@@ -1,7 +1,7 @@
 package dochigosum.simvex.domain.drawing.presentation.dto.response;
 
-public record DrawingExplainResponseDTO(String message) {
-    public static DrawingExplainResponseDTO from(String message) {
-        return new DrawingExplainResponseDTO(message);
+public record DrawingExplainResponseDTO(String name, String detail) {
+    public static DrawingExplainResponseDTO of(String name, String detail) {
+        return new DrawingExplainResponseDTO(name, detail);
     }
 }

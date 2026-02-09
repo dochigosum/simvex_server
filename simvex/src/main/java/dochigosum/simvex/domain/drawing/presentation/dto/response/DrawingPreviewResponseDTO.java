@@ -7,7 +7,7 @@ public record DrawingPreviewResponseDTO(
         String name,
         String previewImgUrl
 ) {
-    public static DrawingPreviewResponseDTO from(Long id, String name, String previewImgUrl) {
+    public static DrawingPreviewResponseDTO of(Long id, String name, String previewImgUrl) {
         return new DrawingPreviewResponseDTO(id, name, previewImgUrl);
     }
 }

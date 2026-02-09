@@ -1,7 +1,10 @@
 package dochigosum.simvex.domain.drawing.presentation.dto.request;
 
-public record DrawingPartsRequestDTO<T>(
-        Long drawingId,
-        T drawing
+import dochigosum.simvex.domain.drawing.presentation.dto.response.DrawingPartsResponseData;
+
+import java.util.List;
+
+public record DrawingPartsRequestDTO(
+        List<DrawingPartsResponseData> parts
 ) {
 }

@@ -19,9 +19,10 @@ public class Drawing {
     @Column(nullable = false)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(nullable = false, name = "member_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "member_id")
     private Member member;
+
 
     @Column(nullable = false, length=50)
     private String name;
@@ -29,7 +30,16 @@ public class Drawing {
     @Column(nullable = false, length = 2000)
     private String detail;
 
-    //todo DrawingPart 개발시 이후에 추가
-//    @OneToMany(mappedBy = "drawing", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<DrawingPart> parts = new ArrayList<>();
+    @OneToMany(mappedBy = "drawing", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DrawingPart> parts = new ArrayList<>();
+
+    public void addPart(DrawingPart part) {
+        parts.add(part);
+        part.setDrawing(this);
+    }
+
+    public void removePart(DrawingPart part) {
+        parts.remove(part);
+        part.setDrawing(null);
+    }
 }

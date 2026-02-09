@@ -8,7 +8,7 @@ public record DrawingData(
         String description
 ) {
 
-    public static DrawingData from(Drawing drawing) {
+    public static DrawingData of(Drawing drawing) {
         return new DrawingData(
                 drawing.getId(),
                 drawing.getName(),
