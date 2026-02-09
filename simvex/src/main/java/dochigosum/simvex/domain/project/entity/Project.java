@@ -45,4 +45,9 @@ public class Project {
         this.name = newName;
         this.updatedAt = LocalDateTime.now();
     }
+
+    public void updatePreviewImage(String previewImgUrl) {
+        this.previewImgUrl = previewImgUrl;
+        this.updatedAt = LocalDateTime.now();
+    }
 }

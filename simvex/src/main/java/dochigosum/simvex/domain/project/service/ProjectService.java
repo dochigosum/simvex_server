@@ -1,14 +1,19 @@
 package dochigosum.simvex.domain.project.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import dochigosum.simvex.domain.project.entity.Part;
 import dochigosum.simvex.domain.project.presentation.dto.request.*;
 import dochigosum.simvex.domain.project.presentation.dto.response.*;
 import dochigosum.simvex.domain.project.entity.Project;
+import dochigosum.simvex.domain.project.repository.PartRepository;
 import dochigosum.simvex.domain.project.repository.ProjectRepository;
 import dochigosum.simvex.global.error.GlobalErrorCode;
 import dochigosum.simvex.global.error.exception.SimvexException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -17,6 +22,10 @@ import java.util.List;
 public class ProjectService {
 
     private final ProjectRepository projectRepository;
+    private final PartRepository partRepository;
+    private final ProjectRedisService projectRedisService;
+    private final ObjectMapper objectMapper;
+    private final ProjectS3Service projectS3Service;
 
     @Transactional
     public ProjectResponse createProject(ProjectCreateRequest request) {
@@ -94,5 +103,65 @@ public class ProjectService {
                     project_name
             );
         }
+    }
+
+    @Transactional
+    public ProjectStoreResponse storeProjectParts(
+            String projectName,
+            String partInfoJson,
+            MultipartFile saveImage,
+            boolean persistToDb
+    ) {
+        Project project = findProjectByName(projectName);
+        List<PartStoreRequest> partRequests = parsePartInfo(partInfoJson);
+
+        // Redis에 항상 저장
+        projectRedisService.savePartsToRedis(project.getId(), partRequests);
+
+        // MySQL 저장 및 이미지 업로드
+        if (persistToDb && saveImage != null && !saveImage.isEmpty()) {
+            savePersistentData(project, partRequests, saveImage);
+        }
+
+        return ProjectStoreResponse.of(projectName);
+    }
+
+    private List<PartStoreRequest> parsePartInfo(String partInfoJson) {
+        try {
+            return objectMapper.readValue(partInfoJson,
+                    objectMapper.getTypeFactory()
+                            .constructCollectionType(List.class,
+                                    PartStoreRequest.class));
+        } catch (JsonProcessingException e) {
+            throw new SimvexException(GlobalErrorCode.INVALID_PART_DATA);
+        }
+    }
+
+    private void savePersistentData(
+            Project project,
+            List<PartStoreRequest> partRequests,
+            MultipartFile saveImage
+    ) {
+        // 기존 부품 삭제
+        partRepository.deleteByProjectId(project.getId());
+
+        // 새 부품 저장
+        List<Part> parts = partRequests.stream()
+                .map(req -> Part.builder()
+                        .projectId(project.getId())
+                        .xCoordinate(req.xCoordinate())
+                        .yCoordinate(req.yCoordinate())
+                        .zCoordinate(req.zCoordinate())
+                        .xRotation(req.xRotation())
+                        .yRotation(req.yRotation())
+                        .zRotation(req.zRotation())
+                        .build())
+                .toList();
+
+        partRepository.saveAll(parts);
+
+        // S3에 이미지 업로드 및 업데이트
+        String imageUrl = projectS3Service.uploadImage(saveImage, project.getName());
+        project.updatePreviewImage(imageUrl);
     }
 }

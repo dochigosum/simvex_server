@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/v1/projects")
@@ -58,6 +59,20 @@ public class ProjectController {
     ) {
         ProjectDeleteResponse response = projectService
                 .deleteProject(project_name);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/{project_name}/store")
+    public ResponseEntity<ProjectStoreResponse> storeProject(
+            @PathVariable String project_name,
+            @RequestPart("partInfo") String partInfo,
+            @RequestPart(value = "saveImage", required = false)
+            MultipartFile saveImage,
+            @RequestParam(defaultValue = "false") boolean persistToDb
+    ) {
+        ProjectStoreResponse response = projectService.storeProjectParts(
+                project_name, partInfo, saveImage, persistToDb
+        );
         return ResponseEntity.ok(response);
     }
 }

@@ -5,7 +5,7 @@ public record ProjectDeleteResponse(
 ) {
     public static ProjectDeleteResponse of(String projectName) {
         return new ProjectDeleteResponse(
-                String.format("Project %s deleted Successfully", projectName)
+                String.format("Project '%s' deleted successfully", projectName)
         );
     }
 }
