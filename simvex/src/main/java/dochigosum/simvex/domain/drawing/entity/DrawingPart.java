@@ -72,5 +72,4 @@ public class DrawingPart {
         this.yRotation = yRotation;
         this.zRotation = zRotation;
     }
-
 }
