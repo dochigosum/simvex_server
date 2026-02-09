@@ -1,5 +1,7 @@
 package dochigosum.simvex.domain.memo.entity;
 
+import dochigosum.simvex.domain.drawing.entity.Drawing;
+
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -15,12 +17,12 @@ public class Memo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "drawing_id", nullable = false)
-//    private Drawing drawing;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "drawing_id", nullable = false)
+    private Drawing drawing;
 
-    @Column(name = "drawing_id", nullable = false)
-    private Long drawingId;
+//    @Column(name = "drawing_id", nullable = false)
+//    private Long drawingId;
 
     @Column(length = 2000, nullable = false)
     private String detail;
