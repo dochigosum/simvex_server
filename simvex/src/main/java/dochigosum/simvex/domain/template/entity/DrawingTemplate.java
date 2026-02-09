@@ -26,6 +26,6 @@ public class DrawingTemplate {
     @Column(nullable = false, length = 255)
     private String imageUrl;
 
-    @OneToMany(mappedBy = "drawing", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "drawingTemplate", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PartTemplate> partTemplates = new ArrayList<>();
 }

@@ -1,12 +1,12 @@
 package dochigosum.simvex.domain.template.service;
 
 import dochigosum.simvex.domain.template.entity.DrawingTemplate;
+import dochigosum.simvex.domain.template.exception.TemplateErrorCode;
 import dochigosum.simvex.domain.template.presentation.dto.response.DrawingListResponse;
 import dochigosum.simvex.domain.template.presentation.dto.response.DrawingSearchResponse;
 import dochigosum.simvex.domain.template.presentation.dto.response.PartListResponse;
 import dochigosum.simvex.domain.template.repository.DrawingTemplateRepository;
 import dochigosum.simvex.domain.template.repository.PartTemplateRepository;
-import dochigosum.simvex.global.error.GlobalErrorCode;
 import dochigosum.simvex.global.error.exception.SimvexException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -34,9 +34,14 @@ public class TemplateService {
     @Transactional(readOnly = true)
     public List<DrawingSearchResponse> searchDrawings(String query) {
 
+        if (query == null || query.isBlank()) {
+            throw new SimvexException(TemplateErrorCode.QUERY_BAD_REQUEST);
+        }
+
         List<DrawingTemplate> drawings = drRepo.findByNameContainsIgnoreCase(query);
+
         if (drawings.isEmpty()) {
-            throw new SimvexException(GlobalErrorCode.NOT_FOUND, "검색 결과가 없습니다: " + query);
+            throw new SimvexException(TemplateErrorCode.TEMPLATE_NOT_FOUND);
         }
 
         return drawings.stream()
