@@ -56,8 +56,8 @@ public class ProjectService {
         return ProjectDetailResponse.from(project);
     }
 
-    public ProjectDetailResponse getProjectDetailByName(String project_name) {
-        Project project = findProjectByName(project_name);
+    public ProjectDetailResponse getProjectDetailByName(String projectId) {
+        Project project = findProjectByName(projectId);
         return ProjectDetailResponse.from(project);
     }
 
@@ -74,10 +74,10 @@ public class ProjectService {
     }
 
     @Transactional
-    public ProjectDeleteResponse deleteProject(String project_name) {
-        Project project = findProjectByName(project_name);
+    public ProjectDeleteResponse deleteProject(String projectId) {
+        Project project = findProjectByName(projectId);
         projectRepository.delete(project);
-        return ProjectDeleteResponse.of(project_name);
+        return ProjectDeleteResponse.of(projectId);
     }
 
     private Project findProjectById(Long projectId) {
@@ -88,19 +88,19 @@ public class ProjectService {
                 ));
     }
 
-    private Project findProjectByName(String project_name) {
-        return projectRepository.findByName(project_name)
+    private Project findProjectByName(String projectId) {
+        return projectRepository.findByName(projectId)
                 .orElseThrow(() -> new SimvexException(
                         GlobalErrorCode.PROJECT_NOT_FOUND,
-                        project_name
+                        projectId
                 ));
     }
 
-    private void validateProjectNameNotDuplicate(String project_name) {
-        if (projectRepository.existsByName(project_name)) {
+    private void validateProjectNameNotDuplicate(String projectId) {
+        if (projectRepository.existsByName(projectId)) {
             throw new SimvexException(
                     GlobalErrorCode.PROJECT_NAME_DUPLICATE,
-                    project_name
+                    projectId
             );
         }
     }

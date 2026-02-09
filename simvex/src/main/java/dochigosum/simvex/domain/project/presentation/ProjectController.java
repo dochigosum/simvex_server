@@ -34,44 +34,44 @@ public class ProjectController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/{project_name}/detail")
+    @GetMapping("/{projectId}/detail")
     public ResponseEntity<ProjectDetailResponse> getProjectDetailByName(
-            @PathVariable String project_name
+            @PathVariable String projectId
     ) {
         ProjectDetailResponse response = projectService
-                .getProjectDetailByName(project_name);
+                .getProjectDetailByName(projectId);
         return ResponseEntity.ok(response);
     }
 
-    @PatchMapping("/{project_name}/rename")
+    @PatchMapping("/{projectId}/rename")
     public ResponseEntity<ProjectDetailResponse> renameProject(
-            @PathVariable String project_name,
+            @PathVariable String projectId,
             @Valid @RequestBody ProjectRenameRequest request
     ) {
         ProjectDetailResponse response = projectService
-                .renameProject(project_name, request);
+                .renameProject(projectId, request);
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/{project_name}/delete")
+    @DeleteMapping("/{projectId}/delete")
     public ResponseEntity<ProjectDeleteResponse> deleteProject(
-            @PathVariable String project_name
+            @PathVariable String projectId
     ) {
         ProjectDeleteResponse response = projectService
-                .deleteProject(project_name);
+                .deleteProject(projectId);
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/{project_name}/store")
+    @PutMapping("/{projectId}/store")
     public ResponseEntity<ProjectStoreResponse> storeProject(
-            @PathVariable String project_name,
+            @PathVariable String projectId,
             @RequestPart("partInfo") String partInfo,
             @RequestPart(value = "saveImage", required = false)
             MultipartFile saveImage,
             @RequestParam(defaultValue = "false") boolean persistToDb
     ) {
         ProjectStoreResponse response = projectService.storeProjectParts(
-                project_name, partInfo, saveImage, persistToDb
+                projectId, partInfo, saveImage, persistToDb
         );
         return ResponseEntity.ok(response);
     }
