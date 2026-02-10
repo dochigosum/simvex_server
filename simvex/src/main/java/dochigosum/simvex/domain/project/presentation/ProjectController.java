@@ -78,10 +78,10 @@ public class ProjectController {
     }
 
     @PostMapping("/{projectId}/parts")
-    public ResponseEntity<PartAddRequest> fetchModelInfo(
+    public ResponseEntity<ModelFetchResponse> fetchModelInfo(
             @PathVariable Long projectId,
             @RequestPart PartAddRequest request
     ) {
-        return ResponseEntity.ok(projectService.fetchModelInfo(projectId, request);
+        return ResponseEntity.ok(projectService.fetchModelInfo(projectId, request));
     }
 }
