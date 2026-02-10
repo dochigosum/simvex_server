@@ -119,12 +119,8 @@ public class DrawingService {
                     .name(tp.getName())
                     .detail(tp.getDetail())
                     .modelFileName(tp.getModelFileName())
-                    .xCoordinate(tp.getXCoordinate())
-                    .yCoordinate(tp.getYCoordinate())
-                    .zCoordinate(tp.getZCoordinate())
-                    .xRotation(tp.getXRotation())
-                    .yRotation(tp.getYRotation())
-                    .zRotation(tp.getZRotation())
+                    .coordinate(tp.getCoordinateAttribute())
+                    .rotation(tp.getRotationAttribute())
                     .build();
 
             newDrawing.addPart(part);

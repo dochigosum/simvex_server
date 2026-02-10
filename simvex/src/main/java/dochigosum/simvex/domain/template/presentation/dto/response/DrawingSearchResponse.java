@@ -11,7 +11,7 @@ public record DrawingSearchResponse(
         return new DrawingSearchResponse(
                 template.getId(),
                 template.getName(),
-                template.getImageUrl()
+                template.getPreviewImg()
         );
     }
 }

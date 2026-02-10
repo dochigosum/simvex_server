@@ -8,6 +8,6 @@ public record MemoResponse(
         String detail
 ) {
     public static MemoResponse from(Memo memo) {
-        return new MemoResponse(memo.getId(), memo.getDrawingId(), memo.getDetail());
+        return new MemoResponse(memo.getId(), memo.getDrawing().getId(), memo.getDetail());
     }
 }

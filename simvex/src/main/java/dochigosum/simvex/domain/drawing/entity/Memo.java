@@ -24,8 +24,8 @@ public class Memo {
     @Column(length = 2000, nullable = false)
     private String detail;
 
-    public Memo(Long drawingId, String detail) {
-        this.drawingId = drawingId;
+    public Memo(Drawing drawing, String detail) {
+        this.drawing = drawing;
         this.detail = detail;
     }
 }

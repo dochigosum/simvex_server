@@ -11,7 +11,7 @@ public record DrawingListResponse(
         return new DrawingListResponse(
                 template.getId(),
                 template.getName(),
-                template.getImageUrl()
+                template.getPreviewImg()
         );
     }
 }
