@@ -11,11 +11,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class CoordinateAttribute {
-    private Integer xCoordinate;
-    private Integer yCoordinate;
-    private Integer zCoordinate;
+    private Double xCoordinate;
+    private Double yCoordinate;
+    private Double zCoordinate;
 
-    public static CoordinateAttribute of(Integer x, Integer y, Integer z) {
+    public static CoordinateAttribute of(Double x, Double y, Double z) {
         return new CoordinateAttribute(x, y, z);
     }
 }

@@ -1,0 +1,17 @@
+# 1. 베이스 이미지 설정 (Java 17 환경)
+FROM openjdk:21-jdk-slim
+
+# 2. 작업 디렉토리 생성
+WORKDIR /app
+
+# 3. 빌드된 jar 파일을 컨테이너 내부로 복사
+# build/libs/ 폴더에 생성된 jar 파일을 app.jar라는 이름으로 복사함
+ARG JAR_FILE=build/libs/*.jar
+COPY ${JAR_FILE} app.jar
+
+# 4. 컨테이너가 사용할 포트 명시
+EXPOSE 8080
+
+# 5. 애플리케이션 실행 명령
+# -Duser.timezone=Asia/Seoul 설정은 서버 시간을 한국으로 맞출 때 유용해요.
+ENTRYPOINT ["java", "-jar", "-Duser.timezone=Asia/Seoul", "app.jar"]

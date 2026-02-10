@@ -79,13 +79,21 @@ public class DrawingService {
     }
 
     @Transactional
-    public List<DrawingAssetResponse> getDrawingAssets(Long drawingId) {
-        Drawing drawing = drawingRepository.findById(drawingId)
-                .orElseThrow(() -> new SimvexException(DrawingErrorCode.NOT_FOUND));
+    public List<DrawingAssetResponse> getDrawingAssets(Long drawingTemplateId) {
+        List<PartTemplate> partTemplates = partTemplateRepository.findAllByDrawingTemplate_Id(drawingTemplateId);
 
-        List<DrawingPart> parts = drawingPartRepository.findAllByDrawing_Id(drawingId);
+        List<DrawingPart> savedParts = partTemplates.stream()
+                .map(tp -> DrawingPart.builder()
+                        .name(tp.getName())
+                        .detail(tp.getDetail())
+                        .modelFileName(tp.getModelFileName())
+                        .coordinate(tp.getCoordinateAttribute())
+                        .rotation(tp.getRotationAttribute())
+                        .build())
+                .map(drawingPartRepository::save) // 각 파트 저장 후 저장된 객체 반환
+                .toList();
 
-        return parts.stream()
+        return savedParts.stream()
                 .map(part -> {
                     String url = s3Service.getDrawingPreviewImgUrl(part.getModelFileName());
                     return DrawingAssetResponse.of(part, url);

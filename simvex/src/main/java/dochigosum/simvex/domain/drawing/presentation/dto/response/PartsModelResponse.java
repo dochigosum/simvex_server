@@ -8,12 +8,12 @@ public record PartsModelResponse(
         Long partId,
         String partName,
         String partModelUrl,
-        Integer xCoordinate,
-        Integer yCoordinate,
-        Integer zCoordinate,
-        Integer xRotation,
-        Integer yRotation,
-        Integer zRotation
+        Double xCoordinate,
+        Double yCoordinate,
+        Double zCoordinate,
+        Double xRotation,
+        Double yRotation,
+        Double zRotation
 ) {
     public static PartsModelResponse from(DrawingPart part, String partModelUrl) {
         // 엔티티에서 임베디드 객체를 먼저 꺼냅니다.

@@ -11,11 +11,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class RotationAttribute {
-    private Integer xRotation;
-    private Integer yRotation;
-    private Integer zRotation;
+    private Double xRotation;
+    private Double yRotation;
+    private Double zRotation;
 
-    public static RotationAttribute of(Integer x, Integer y, Integer z) {
+    public static RotationAttribute of(Double x, Double y, Double z) {
         return new RotationAttribute(x, y, z);
     }
 }
