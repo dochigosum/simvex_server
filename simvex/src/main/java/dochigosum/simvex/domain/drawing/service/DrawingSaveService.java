@@ -1,5 +1,7 @@
 package dochigosum.simvex.domain.drawing.service;
 
+import dochigosum.simvex.domain.common.CoordinateAttribute;
+import dochigosum.simvex.domain.common.RotationAttribute;
 import dochigosum.simvex.domain.drawing.presentation.dto.request.PartTransformRequest;
 import dochigosum.simvex.domain.drawing.repository.DrawingPartRepository;
 import lombok.RequiredArgsConstructor;
@@ -41,8 +43,16 @@ public class DrawingSaveService {
                 // DB의 해당 부품을 찾아서 위치 정보 업데이트
                 drawingPartRepository.findById(cachedData.partId()).ifPresent(part -> {
                     part.updateTransform(
-                            cachedData.xCoordinate(), cachedData.yCoordinate(), cachedData.zCoordinate(),
-                            cachedData.xRotation(), cachedData.yRotation(), cachedData.zRotation()
+                            CoordinateAttribute.of(
+                                    cachedData.xCoordinate(),
+                                    cachedData.yCoordinate(),
+                                    cachedData.zCoordinate()
+                            ),
+                            RotationAttribute.of(
+                                    cachedData.xRotation(),
+                                    cachedData.yRotation(),
+                                    cachedData.zRotation()
+                            )
                     );
                 });
                 // 동기화 완료 후 Redis 키 삭제
@@ -50,5 +60,4 @@ public class DrawingSaveService {
             }
         }
     }
-
 }

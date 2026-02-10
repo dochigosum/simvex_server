@@ -1,7 +1,7 @@
-package dochigosum.simvex.domain.memberverifications.repository;
+package dochigosum.simvex.domain.member.repository;
 
 import dochigosum.simvex.domain.member.entity.Member;
-import dochigosum.simvex.domain.memberverifications.entity.MemberVerification;
+import dochigosum.simvex.domain.member.entity.MemberVerification;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

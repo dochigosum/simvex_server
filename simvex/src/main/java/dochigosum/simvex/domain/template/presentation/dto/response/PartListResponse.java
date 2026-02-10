@@ -11,7 +11,7 @@ public record PartListResponse(
         return new PartListResponse(
                 template.getId(),
                 template.getName(),
-                template.getFileName()
+                template.getModelFileName()
         );
     }
 }

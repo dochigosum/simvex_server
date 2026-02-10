@@ -23,11 +23,14 @@ public class Drawing {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @Column(nullable = false, length=50)
+    @Column(nullable = false, length = 50)
     private String name;
 
     @Column(nullable = false, length = 2000)
     private String detail;
+
+    @Column(nullable = false)
+    private String previewImg;
 
     @OneToMany(mappedBy = "drawing", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DrawingPart> parts = new ArrayList<>();

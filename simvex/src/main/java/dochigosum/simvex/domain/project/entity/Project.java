@@ -1,5 +1,6 @@
 package dochigosum.simvex.domain.project.entity;
 
+import dochigosum.simvex.domain.drawing.entity.DrawingPart;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -7,6 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "project")
@@ -18,8 +21,8 @@ public class Project {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
+    @Column(name = "member_id", nullable = false)
+    private Long memberId;
 
     @Column(nullable = false, length = 255)
     private String name;
@@ -33,9 +36,12 @@ public class Project {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Part> parts = new ArrayList<>();
+
     @Builder
-    public Project(Long userId, String name, String previewImgUrl) {
-        this.userId = userId;
+    public Project(Long memberId, String name, String previewImgUrl) {
+        this.memberId = memberId;
         this.name = name;
         this.previewImgUrl = previewImgUrl;
         this.createdAt = LocalDateTime.now();

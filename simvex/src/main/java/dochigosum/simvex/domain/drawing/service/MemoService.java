@@ -1,5 +1,6 @@
 package dochigosum.simvex.domain.drawing.service;
 
+import dochigosum.simvex.domain.drawing.entity.Drawing;
 import dochigosum.simvex.domain.drawing.repository.DrawingRepository;
 import dochigosum.simvex.domain.drawing.entity.Memo;
 import dochigosum.simvex.domain.drawing.exception.MemoErrorCode;
@@ -16,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemoService {
 
     private final MemoRepository memoRepository;
-//    private final DrawingRepository drawingRepository;
+    private final DrawingRepository drawingRepository;
 
     @Transactional
     public Long create(Long drawingId, String detail) {
@@ -25,11 +26,10 @@ public class MemoService {
             throw new SimvexException(GlobalErrorCode.INVALID_REQUEST);
         }
 
-        if (!drawingRepository.existsById(drawingId)) {
-            throw new SimvexException(MemoErrorCode.DRAWING_NOT_FOUND);
-        }
+        Drawing drawing = drawingRepository.findById(drawingId)
+                .orElseThrow(() -> new SimvexException(MemoErrorCode.DRAWING_NOT_FOUND));
 
-        Memo memo = memoRepository.save(new Memo(drawingId, detail));
+        Memo memo = memoRepository.save(new Memo(drawing, detail));
         return memo.getId();
     }
 

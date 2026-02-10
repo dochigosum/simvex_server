@@ -1,83 +1,76 @@
 package dochigosum.simvex.domain.project.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import dochigosum.simvex.domain.common.CoordinateAttribute;
+import dochigosum.simvex.domain.common.RotationAttribute;
 import dochigosum.simvex.domain.project.entity.Part;
 import dochigosum.simvex.domain.project.presentation.dto.request.*;
 import dochigosum.simvex.domain.project.presentation.dto.response.*;
 import dochigosum.simvex.domain.project.entity.Project;
 import dochigosum.simvex.domain.project.repository.PartRepository;
 import dochigosum.simvex.domain.project.repository.ProjectRepository;
+import dochigosum.simvex.domain.template.entity.PartTemplate;
+import dochigosum.simvex.domain.template.repository.PartTemplateRepository;
 import dochigosum.simvex.global.error.GlobalErrorCode;
 import dochigosum.simvex.global.error.exception.SimvexException;
+import dochigosum.simvex.global.s3.S3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ProjectService {
 
     private final ProjectRepository projectRepository;
     private final PartRepository partRepository;
+    private final PartTemplateRepository partTemplateRepository;
     private final ProjectRedisService projectRedisService;
-    private final ObjectMapper objectMapper;
-    private final ProjectS3Service projectS3Service;
+    private final S3Service s3Service;
 
     @Transactional
-    public ProjectResponse createProject(ProjectCreateRequest request) {
-        validateProjectNameNotDuplicate(request.name());
+    public void createProject(Long memberId, ProjectCreateRequest request) {
 
         Project project = Project.builder()
-                .userId(request.userId())
+                .memberId(memberId)
                 .name(request.name())
-                .previewImgUrl(request.previewImgUrl())
                 .build();
-
-        Project savedProject = projectRepository.save(project);
-        return ProjectResponse.from(savedProject);
+        projectRepository.save(project);
     }
 
-    public ProjectListResponse getProjectsByUserId(Long userId) {
-        List<Project> projects = projectRepository.findByUserId(userId);
+    public List<ProjectsResponse> getProjects(Long memberId) {
+        List<Project> projects = projectRepository.findAllByMemberId((memberId));
 
-        List<ProjectResponse> projectResponses = projects.stream()
-                .map(ProjectResponse::from)
+        return projects.stream()
+                .map(ProjectsResponse::from)
                 .toList();
-
-        return ProjectListResponse.from(projectResponses);
     }
 
-    public ProjectDetailResponse getProjectDetailById(Long projectId) {
+    public ProjectDetailResponse getProjectDetail(Long projectId) {
         Project project = findProjectById(projectId);
         return ProjectDetailResponse.from(project);
     }
 
-    public ProjectDetailResponse getProjectDetailByName(String projectId) {
-        Project project = findProjectByName(projectId);
-        return ProjectDetailResponse.from(project);
-    }
-
-    @Transactional(readOnly = true)
+    @Transactional
     public ProjectDetailResponse renameProject(
-            String currentName,
+            Long projectId,
             ProjectRenameRequest request
     ) {
-        Project project = findProjectByName(currentName);
-        validateProjectNameNotDuplicate(request.newName());
+        Project project = findProjectById(projectId);
 
         project.rename(request.newName());
         return ProjectDetailResponse.from(project);
     }
 
     @Transactional
-    public ProjectDeleteResponse deleteProject(String projectId) {
-        Project project = findProjectByName(projectId);
+    public ProjectDeleteResponse deleteProject(Long projectId) {
+        Project project = findProjectById(projectId);
         projectRepository.delete(project);
-        return ProjectDeleteResponse.of(projectId);
+        return ProjectDeleteResponse.of(project.getName());
     }
 
     private Project findProjectById(Long projectId) {
@@ -88,80 +81,66 @@ public class ProjectService {
                 ));
     }
 
-    private Project findProjectByName(String projectId) {
-        return projectRepository.findByName(projectId)
-                .orElseThrow(() -> new SimvexException(
-                        GlobalErrorCode.PROJECT_NOT_FOUND,
-                        projectId
-                ));
+    // 프로젝트에 부품 추가(부품 로딩)
+    @Transactional
+    public ModelFetchResponse fetchModelInfo(Long projectId, PartAddRequest request) {
+        Project project = findProjectById(projectId);
+        PartTemplate partTemplate = partTemplateRepository.findById(request.partTemplateId())
+                .orElseThrow(() -> new SimvexException(GlobalErrorCode.PART_NOT_FOUND, "partTemplateId=" + request.partTemplateId()));
+
+        String modelUrl = s3Service.getPartModelUrl(partTemplate.getDrawingTemplate().getName(), partTemplate.getModelFileName());
+
+        Part newPart = Part.builder()
+                .name(partTemplate.getName())
+                .modelFileName(partTemplate.getModelFileName())
+                .project(project)
+                .coordinate(partTemplate.getCoordinateAttribute())
+                .rotation(partTemplate.getRotationAttribute())
+                .build();
+
+        partRepository.save(newPart);
+
+        return new ModelFetchResponse(partTemplate.getModelFileName(), modelUrl);
     }
 
-    private void validateProjectNameNotDuplicate(String projectId) {
-        if (projectRepository.existsByName(projectId)) {
-            throw new SimvexException(
-                    GlobalErrorCode.PROJECT_NAME_DUPLICATE,
-                    projectId
-            );
-        }
-    }
 
     @Transactional
     public ProjectStoreResponse storeProjectParts(
-            String projectName,
-            String partInfoJson,
-            MultipartFile saveImage,
-            boolean persistToDb
-    ) {
-        Project project = findProjectByName(projectName);
-        List<PartStoreRequest> partRequests = parsePartInfo(partInfoJson);
-
-        // Redis에 항상 저장
-        projectRedisService.savePartsToRedis(project.getId(), partRequests);
-
-        // MySQL 저장 및 이미지 업로드
-        if (persistToDb && saveImage != null && !saveImage.isEmpty()) {
-            savePersistentData(project, partRequests, saveImage);
-        }
-
-        return ProjectStoreResponse.of(projectName);
-    }
-
-    private List<PartStoreRequest> parsePartInfo(String partInfoJson) {
-        try {
-            return objectMapper.readValue(partInfoJson,
-                    objectMapper.getTypeFactory()
-                            .constructCollectionType(List.class,
-                                    PartStoreRequest.class));
-        } catch (JsonProcessingException e) {
-            throw new SimvexException(GlobalErrorCode.INVALID_PART_DATA);
-        }
-    }
-
-    private void savePersistentData(
-            Project project,
-            List<PartStoreRequest> partRequests,
+            Long projectId,
+            List<PartStoreRequest> requests,
             MultipartFile saveImage
     ) {
-        // 기존 부품 삭제
-        partRepository.deleteByProjectId(project.getId());
+        Project project = findProjectById(projectId);
 
-        // 새 부품 저장
-        List<Part> parts = partRequests.stream()
-                .map(req -> Part.builder()
-                        .projectId(project.getId())
-                        .xCoordinate(req.xCoordinate())
-                        .yCoordinate(req.yCoordinate())
-                        .zCoordinate(req.zCoordinate())
-                        .xRotation(req.xRotation())
-                        .yRotation(req.yRotation())
-                        .zRotation(req.zRotation())
-                        .build())
-                .toList();
+        if (saveImage != null && !saveImage.isEmpty()) {
+            // MySQL 저장 + S3 이미지 업로드
+            return saveToMySqlWithImage(projectId, requests, saveImage);
+        }
 
-        partRepository.saveAll(parts);
+        // Redis에 항상 저장
+        projectRedisService.savePartsToRedis(project.getId(), requests);
+        return ProjectStoreResponse.of(project.getName());
+    }
 
-        // S3에 이미지 업로드 및 업데이트
-        String imageUrl = projectS3Service.uploadImage(saveImage, project.getName());
+    private ProjectStoreResponse saveToMySqlWithImage(Long projectId, List<PartStoreRequest> partInfo, MultipartFile saveImage) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new SimvexException(GlobalErrorCode.PROJECT_NOT_FOUND, "Project ID: " + projectId));
+
+        // 1. S3 이미지 업로드 및 URL 갱신
+        String imageUrl = s3Service.uploadProjectPreviewImg(project.getMemberId(), project.getName(), saveImage);
         project.updatePreviewImage(imageUrl);
+
+        // 2. 부품 위치 업데이트 (기존에 만든 updateTransform 활용)
+        project.getParts().forEach(part -> {
+            partInfo.stream()
+                    .filter(req -> req.id().equals(part.getId()))
+                    .findFirst()
+                    .ifPresent(req -> part.updateTransform(
+                            CoordinateAttribute.of(req.xCoordinate(), req.yCoordinate(), req.zCoordinate()),
+                            RotationAttribute.of(req.xRotation(), req.yRotation(), req.zRotation())
+                    ));
+        });
+
+        return new ProjectStoreResponse("Project saved successfully to MySQL", LocalDateTime.now());
     }
 }

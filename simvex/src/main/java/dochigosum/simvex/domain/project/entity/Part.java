@@ -1,5 +1,7 @@
 package dochigosum.simvex.domain.project.entity;
 
+import dochigosum.simvex.domain.common.CoordinateAttribute;
+import dochigosum.simvex.domain.common.RotationAttribute;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -16,57 +18,34 @@ public class Part {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "project_id", nullable = false)
-    private Long projectId;
-
     @Column(nullable = false, length = 50)
     private String name;
 
-    @Column(name = "file_name", length = 50)
-    private String fileName;
+    @Column(nullable = false, length = 50)
+    private String modelFileName;
 
-    @Column(name = "x_coordinate")
-    private Long xCoordinate;
+    @Embedded
+    private CoordinateAttribute coordinate;
 
-    @Column(name = "y_coordinate")
-    private Long yCoordinate;
+    @Embedded
+    private RotationAttribute rotation;
 
-    @Column(name = "z_coordinate")
-    private Long zCoordinate;
-
-    @Column(name = "x_rotation")
-    private Long xRotation;
-
-    @Column(name = "y_rotation")
-    private Long yRotation;
-
-    @Column(name = "z_rotation")
-    private Long zRotation;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "project_id")
+    private Project project;
 
     @Builder
-    public Part(Long projectId, String name, String fileName,
-                Long xCoordinate, Long yCoordinate, Long zCoordinate,
-                Long xRotation, Long yRotation, Long zRotation) {
-        this.projectId = projectId;
+    public Part(String name, String modelFileName, Project project,
+                CoordinateAttribute coordinate, RotationAttribute rotation) {
         this.name = name;
-        this.fileName = fileName;
-        this.xCoordinate = xCoordinate;
-        this.yCoordinate = yCoordinate;
-        this.zCoordinate = zCoordinate;
-        this.xRotation = xRotation;
-        this.yRotation = yRotation;
-        this.zRotation = zRotation;
+        this.modelFileName = modelFileName;
+        this.project = project;
+        this.coordinate = coordinate;
+        this.rotation = rotation;
     }
 
-    public void updatePosition(Long x, Long y, Long z) {
-        this.xCoordinate = x;
-        this.yCoordinate = y;
-        this.zCoordinate = z;
-    }
-
-    public void updateRotation(Long x, Long y, Long z) {
-        this.xRotation = x;
-        this.yRotation = y;
-        this.zRotation = z;
+    public void updateTransform(CoordinateAttribute coordinate, RotationAttribute rotation) {
+        this.coordinate = coordinate;
+        this.rotation = rotation;
     }
 }
