@@ -94,13 +94,13 @@ public class DrawingService {
     }
 
     @Transactional
-    public void createDrawingSession(Long templateId, Long userId) {
+    public void createDrawingSession(Long templateId, Long memberId) {
         DrawingTemplate drawingTemplate = drawingTemplateRepository.findById(templateId)
                 .orElseThrow(() -> new SimvexException(DrawingErrorCode.NOT_FOUND));
 
         List<PartTemplate> partTemplates = partTemplateRepository.findAllByDrawingTemplate_Id(templateId);
 
-        Member member = memberRepository.getReferenceById(userId);
+        Member member = memberRepository.getReferenceById(memberId);
 
         Drawing newDrawing = Drawing.builder()
                 .member(member)

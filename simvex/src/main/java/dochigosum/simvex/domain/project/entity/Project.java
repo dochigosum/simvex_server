@@ -1,6 +1,5 @@
 package dochigosum.simvex.domain.project.entity;
 
-import dochigosum.simvex.domain.drawing.entity.DrawingPart;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -47,6 +46,7 @@ public class Project {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
+
     public void rename(String newName) {
         this.name = newName;
         this.updatedAt = LocalDateTime.now();

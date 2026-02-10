@@ -4,6 +4,7 @@ import dochigosum.simvex.domain.drawing.presentation.dto.request.DrawingAssetReq
 import dochigosum.simvex.domain.drawing.presentation.dto.response.DrawingAssetResponse;
 import dochigosum.simvex.domain.drawing.presentation.dto.response.*;
 import dochigosum.simvex.domain.drawing.service.DrawingService;
+import dochigosum.simvex.global.security.userdetails.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -54,8 +55,8 @@ public class DrawingController {
     @PostMapping("/template/select")
     public ResponseEntity<Void> selectDrawingTemplate(
             @RequestBody DrawingAssetRequest request,
-            @AuthenticationPrincipal Long userId) {
-        drawingService.createDrawingSession(request.drawingTemplateId(), userId);
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+        drawingService.createDrawingSession(request.drawingTemplateId(), userDetails.getId());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }

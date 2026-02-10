@@ -3,6 +3,7 @@ package dochigosum.simvex.domain.project.presentation;
 import dochigosum.simvex.domain.project.presentation.dto.request.*;
 import dochigosum.simvex.domain.project.presentation.dto.response.*;
 import dochigosum.simvex.domain.project.service.ProjectService;
+import dochigosum.simvex.global.security.userdetails.CustomUserDetails;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,10 +24,10 @@ public class ProjectController {
     // 프로젝트 생성
     @PostMapping
     public ResponseEntity<Void> createProject(
-            @AuthenticationPrincipal Long memberId,
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @Valid @RequestBody ProjectCreateRequest request
     ) {
-        projectService.createProject(memberId, request);
+        projectService.createProject(userDetails.getId(), request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
