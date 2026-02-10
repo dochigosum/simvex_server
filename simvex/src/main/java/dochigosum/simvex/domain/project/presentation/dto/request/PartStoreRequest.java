@@ -2,11 +2,11 @@ package dochigosum.simvex.domain.project.presentation.dto.request;
 
 public record PartStoreRequest(
         Long id,
-        Long xCoordinate,
-        Long yCoordinate,
-        Long zCoordinate,
-        Long xRotation,
-        Long yRotation,
-        Long zRotation
+        Integer xCoordinate,
+        Integer yCoordinate,
+        Integer zCoordinate,
+        Integer xRotation,
+        Integer yRotation,
+        Integer zRotation
 ) {
 }

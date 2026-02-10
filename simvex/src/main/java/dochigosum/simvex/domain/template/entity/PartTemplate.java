@@ -1,5 +1,7 @@
 package dochigosum.simvex.domain.template.entity;
 
+import dochigosum.simvex.domain.common.CoordinateAttribute;
+import dochigosum.simvex.domain.common.RotationAttribute;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -23,13 +25,11 @@ public class PartTemplate {
     @Column(nullable = false, length = 255)
     private String modelFileName;
 
-    private Integer xCoordinate;
-    private Integer yCoordinate;
-    private Integer zCoordinate;
+    @Embedded
+    private CoordinateAttribute coordinateAttribute;
 
-    private Integer xRotation;
-    private Integer yRotation;
-    private Integer zRotation;
+    @Embedded
+    private RotationAttribute rotationAttribute;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "drawing_id")

@@ -66,8 +66,7 @@ public class ProjectController {
     public ResponseEntity<ProjectStoreResponse> storeProject(
             @PathVariable String projectId,
             @RequestPart("partInfo") String partInfo,
-            @RequestPart(value = "saveImage", required = false)
-            MultipartFile saveImage,
+            @RequestPart(value = "saveImage", required = false) MultipartFile saveImage,
             @RequestParam(defaultValue = "false") boolean persistToDb
     ) {
         ProjectStoreResponse response = projectService.storeProjectParts(

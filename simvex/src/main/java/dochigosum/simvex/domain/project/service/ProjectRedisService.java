@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dochigosum.simvex.domain.project.presentation.dto.request.PartStoreRequest;
 import dochigosum.simvex.global.error.GlobalErrorCode;
-import dochigosum.simvex.domain.project.exception.ProjectException;
+import dochigosum.simvex.global.error.exception.SimvexException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -31,7 +31,7 @@ public class ProjectRedisService {
             redisTemplate.opsForValue().set(key, jsonValue, TTL);
             log.info("Parts saved to Redis for project: {}", projectId);
         } catch (JsonProcessingException e) {
-            throw new ProjectException(GlobalErrorCode.INVALID_PART_DATA);
+            throw new SimvexException(GlobalErrorCode.INVALID_PART_DATA);
         }
     }
 
@@ -49,7 +49,7 @@ public class ProjectRedisService {
                             .constructCollectionType(List.class,
                                     PartStoreRequest.class));
         } catch (JsonProcessingException e) {
-            throw new ProjectException(GlobalErrorCode.INVALID_PART_DATA);
+            throw new SimvexException(GlobalErrorCode.INVALID_PART_DATA);
         }
     }
 }

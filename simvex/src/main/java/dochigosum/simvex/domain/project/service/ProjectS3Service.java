@@ -1,7 +1,7 @@
 package dochigosum.simvex.domain.project.service;
 
 import dochigosum.simvex.global.error.GlobalErrorCode;
-import dochigosum.simvex.domain.project.exception.ProjectException;
+import dochigosum.simvex.global.error.exception.SimvexException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,7 +44,7 @@ public class ProjectS3Service {
             log.info("Image uploaded to S3: {}", imageUrl);
             return imageUrl;
         } catch (IOException e) {
-            throw new ProjectException(GlobalErrorCode.IMAGE_UPLOAD_FAILED);
+            throw new SimvexException(GlobalErrorCode.IMAGE_UPLOAD_FAILED);
         }
     }
 

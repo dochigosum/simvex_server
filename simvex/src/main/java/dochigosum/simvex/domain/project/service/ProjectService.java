@@ -2,6 +2,8 @@ package dochigosum.simvex.domain.project.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dochigosum.simvex.domain.common.CoordinateAttribute;
+import dochigosum.simvex.domain.common.RotationAttribute;
 import dochigosum.simvex.domain.project.entity.Part;
 import dochigosum.simvex.domain.project.presentation.dto.request.*;
 import dochigosum.simvex.domain.project.presentation.dto.response.*;
@@ -32,7 +34,7 @@ public class ProjectService {
         validateProjectNameNotDuplicate(request.name());
 
         Project project = Project.builder()
-                .userId(request.userId())
+                .memberId(request.memberId())
                 .name(request.name())
                 .previewImgUrl(request.previewImgUrl())
                 .build();
@@ -149,12 +151,16 @@ public class ProjectService {
         List<Part> parts = partRequests.stream()
                 .map(req -> Part.builder()
                         .projectId(project.getId())
-                        .xCoordinate(req.xCoordinate())
-                        .yCoordinate(req.yCoordinate())
-                        .zCoordinate(req.zCoordinate())
-                        .xRotation(req.xRotation())
-                        .yRotation(req.yRotation())
-                        .zRotation(req.zRotation())
+                        .coordinate(CoordinateAttribute.of(
+                                req.xCoordinate(),
+                                req.yCoordinate(),
+                                req.zCoordinate()
+                        ))
+                        .rotation(RotationAttribute.of(
+                                req.xRotation(),
+                                req.yRotation(),
+                                req.zRotation()
+                        ))
                         .build())
                 .toList();
 

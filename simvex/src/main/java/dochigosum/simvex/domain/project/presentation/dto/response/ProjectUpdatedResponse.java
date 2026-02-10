@@ -15,7 +15,7 @@ public record ProjectUpdatedResponse(
     public static ProjectUpdatedResponse from(Project project) {
         return new ProjectUpdatedResponse(
                 project.getId(),
-                project.getUserId(),
+                project.getMemberId(),
                 project.getName(),
                 project.getPreviewImgUrl(),
                 project.getCreatedAt(),

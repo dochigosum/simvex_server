@@ -4,14 +4,14 @@ import dochigosum.simvex.domain.project.entity.Project;
 
 public record ProjectResponse(
         Long id,
-        Long userId,
+        Long memberId,
         String name,
         String previewImgUrl
 ) {
     public static ProjectResponse from(Project project) {
         return new ProjectResponse(
                 project.getId(),
-                project.getUserId(),
+                project.getMemberId(),
                 project.getName(),
                 project.getPreviewImgUrl()
         );
