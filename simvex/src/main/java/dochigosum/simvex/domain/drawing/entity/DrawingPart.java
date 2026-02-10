@@ -20,6 +20,9 @@ public class DrawingPart {
     @Column(nullable = false, length = 50)
     private String name;
 
+    @Column(nullable = false, length = 2000)
+    private String detail;
+
     @Column(nullable = false, length = 50)
     private String fileName;
 
@@ -34,6 +37,7 @@ public class DrawingPart {
     @Builder
     private DrawingPart(
             String name,
+            String detail,
             String fileName,
             Integer xCoordinate,
             Integer yCoordinate,
@@ -43,6 +47,7 @@ public class DrawingPart {
             Integer zRotation
     ) {
         this.name = name;
+        this.detail = detail;
         this.fileName = fileName;
         this.xCoordinate = xCoordinate;
         this.yCoordinate = yCoordinate;

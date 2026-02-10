@@ -11,7 +11,7 @@ public record PartExplainResponse(
         return new PartExplainResponse(
                 part.getId(),
                 part.getName(),
-                part.getFileName()
+                part.getDetail()
         );
     }
 }

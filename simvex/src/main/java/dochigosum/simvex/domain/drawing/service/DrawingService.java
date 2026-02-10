@@ -27,7 +27,6 @@ public class DrawingService {
     private final DrawingRepository drawingRepository;
     private final DrawingPartRepository drawingPartRepository;
     private final MemberRepository memberRepository;
-    private final ConversationRepository conversationRepository;
     private final S3Service s3Service;
 
     // 조립도 정보 반환
@@ -85,25 +84,44 @@ public class DrawingService {
                 .toList();
     }
 
+    // todo: 이후 연결
     @Transactional
     public void createDrawingSession(Long templateId, Long userId) {
-        DrawingTemplate template = drawingTemplateRepository.findById(templateId)
+        DrawingTemplate drawingTemplate = drawingTemplateRepository.findById(templateId)
+                .orElseThrow(() -> new SimvexException(DrawingErrorCode.NOT_FOUND));
+
+        DrawingPartTemplate partTemplate = drawingPartTemplateRepository.findById(templateId)
                 .orElseThrow(() -> new SimvexException(DrawingErrorCode.NOT_FOUND));
 
         Member member = memberRepository.getReferenceById(userId);
 
         Drawing newDrawing = Drawing.builder()
                 .member(member)
-                .name(template.getName())
-                .previewImgUrl(template.getPreviewImgUrl())
+                .name(drawingTemplate.getName())
+                .previewImgUrl(drawingTemplate.getPreviewImgUrl())
                 .build();
-
-        Drawing savedDrawing = drawingRepository.save(newDrawing);
 
         Conversation conversation = Conversation.builder()
-                .drawing(savedDrawing)
+                .drawing(newDrawing)
                 .build();
+        newDrawing.addConversation(conversation);
 
-        conversationRepository.save(conversation);
+        partTemplate.forEach(tp -> {
+            DrawingPart part = DrawingPart.builder()
+                    .name(tp.getName())
+                    .detail(tp.getDetail())
+                    .fileName(tp.getFileName())
+                    .xCoordinate(tp.getXCoordinate())
+                    .yCoordinate(tp.getYCoordinate())
+                    .zCoordinate(tp.getZCoordinate())
+                    .xRotation(tp.getXRotation())
+                    .yRotation(tp.getYRotation())
+                    .zRotation(tp.getZRotation())
+                    .build();
+
+            newDrawing.addPart(part);
+        });
+
+        drawingRepository.save(newDrawing);
     }
 }

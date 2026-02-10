@@ -2,9 +2,6 @@ package dochigosum.simvex.domain.drawing.service;
 
 import dochigosum.simvex.domain.drawing.presentation.dto.request.PartTransformRequest;
 import dochigosum.simvex.domain.drawing.repository.DrawingPartRepository;
-import dochigosum.simvex.domain.drawing.repository.DrawingRepository;
-import dochigosum.simvex.global.error.exception.SimvexException;
-import dochigosum.simvex.global.s3.S3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;

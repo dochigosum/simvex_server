@@ -41,12 +41,7 @@ public class Drawing {
         part.setDrawing(this);
     }
 
-    public void removePart(DrawingPart part) {
-        parts.remove(part);
-        part.setDrawing(null);
-    }
-
-    public void updateConversation(Conversation conversation) {
+    public void addConversation(Conversation conversation) {
         this.conversation = conversation;
     }
 }

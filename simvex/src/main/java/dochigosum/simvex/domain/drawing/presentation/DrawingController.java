@@ -46,7 +46,7 @@ public class DrawingController {
     }
 
     @PostMapping("/part/asset")
-    public ResponseEntity<List<DrawingAssetResponse>> getHomeAssets(
+    public ResponseEntity<List<DrawingAssetResponse>> getAssets(
             @RequestBody DrawingAssetRequest request) {
         return ResponseEntity.ok(drawingService.getDrawingAssets(request.drawingTemplateId()));
     }
