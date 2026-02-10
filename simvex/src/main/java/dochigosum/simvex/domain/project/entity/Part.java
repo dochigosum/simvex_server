@@ -18,9 +18,6 @@ public class Part {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "project_id", nullable = false)
-    private Long projectId;
-
     @Column(nullable = false, length = 50)
     private String name;
 
@@ -38,11 +35,11 @@ public class Part {
     private Project project;
 
     @Builder
-    public Part(Long projectId, String name, String modelFileName,
+    public Part(String name, String modelFileName, Project project,
                 CoordinateAttribute coordinate, RotationAttribute rotation) {
-        this.projectId = projectId;
         this.name = name;
         this.modelFileName = modelFileName;
+        this.project = project;
         this.coordinate = coordinate;
         this.rotation = rotation;
     }

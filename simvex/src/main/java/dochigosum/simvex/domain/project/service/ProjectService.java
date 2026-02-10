@@ -1,6 +1,5 @@
 package dochigosum.simvex.domain.project.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import dochigosum.simvex.domain.common.CoordinateAttribute;
 import dochigosum.simvex.domain.common.RotationAttribute;
 import dochigosum.simvex.domain.project.entity.Part;
@@ -9,6 +8,8 @@ import dochigosum.simvex.domain.project.presentation.dto.response.*;
 import dochigosum.simvex.domain.project.entity.Project;
 import dochigosum.simvex.domain.project.repository.PartRepository;
 import dochigosum.simvex.domain.project.repository.ProjectRepository;
+import dochigosum.simvex.domain.template.entity.PartTemplate;
+import dochigosum.simvex.domain.template.repository.PartTemplateRepository;
 import dochigosum.simvex.global.error.GlobalErrorCode;
 import dochigosum.simvex.global.error.exception.SimvexException;
 import dochigosum.simvex.global.s3.S3Service;
@@ -22,65 +23,54 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ProjectService {
 
     private final ProjectRepository projectRepository;
     private final PartRepository partRepository;
+    private final PartTemplateRepository partTemplateRepository;
     private final ProjectRedisService projectRedisService;
-    private final ObjectMapper objectMapper;
     private final S3Service s3Service;
 
     @Transactional
-    public ProjectResponse createProject(ProjectCreateRequest request) {
-        validateProjectNameNotDuplicate(request.name());
+    public void createProject(Long memberId, ProjectCreateRequest request) {
 
         Project project = Project.builder()
-                .memberId(request.memberId())
+                .memberId(memberId)
                 .name(request.name())
-                .previewImgUrl(request.previewImgUrl())
                 .build();
-
-        Project savedProject = projectRepository.save(project);
-        return ProjectResponse.from(savedProject);
+        projectRepository.save(project);
     }
 
-    public ProjectListResponse getProjects(Long memberId) {
-        List<Project> projects = projectRepository.findByMemberId(memberId);
+    public List<ProjectsResponse> getProjects(Long memberId) {
+        List<Project> projects = projectRepository.findAllByMemberId((memberId));
 
-        List<ProjectResponse> projectResponses = projects.stream()
-                .map(ProjectResponse::from)
+        return projects.stream()
+                .map(ProjectsResponse::from)
                 .toList();
-
-        return ProjectListResponse.from(projectResponses);
     }
 
-    public ProjectDetailResponse getProjectDetailById(Long projectId) {
+    public ProjectDetailResponse getProjectDetail(Long projectId) {
         Project project = findProjectById(projectId);
         return ProjectDetailResponse.from(project);
     }
 
-    public ProjectDetailResponse getProjectDetailByName(String projectId) {
-        Project project = findProjectByName(projectId);
-        return ProjectDetailResponse.from(project);
-    }
-
-    @Transactional(readOnly = true)
+    @Transactional
     public ProjectDetailResponse renameProject(
-            String currentName,
+            Long projectId,
             ProjectRenameRequest request
     ) {
-        Project project = findProjectByName(currentName);
-        validateProjectNameNotDuplicate(request.newName());
+        Project project = findProjectById(projectId);
 
         project.rename(request.newName());
         return ProjectDetailResponse.from(project);
     }
 
     @Transactional
-    public ProjectDeleteResponse deleteProject(String projectId) {
-        Project project = findProjectByName(projectId);
+    public ProjectDeleteResponse deleteProject(Long projectId) {
+        Project project = findProjectById(projectId);
         projectRepository.delete(project);
-        return ProjectDeleteResponse.of(projectId);
+        return ProjectDeleteResponse.of(project.getName());
     }
 
     private Project findProjectById(Long projectId) {
@@ -91,22 +81,28 @@ public class ProjectService {
                 ));
     }
 
-    private Project findProjectByName(String projectId) {
-        return projectRepository.findByName(projectId)
-                .orElseThrow(() -> new SimvexException(
-                        GlobalErrorCode.PROJECT_NOT_FOUND,
-                        projectId
-                ));
+    // 프로젝트에 부품 추가(부품 로딩)
+    @Transactional
+    public ModelFetchResponse fetchModelInfo(Long projectId, PartAddRequest request) {
+        Project project = findProjectById(projectId);
+        PartTemplate partTemplate = partTemplateRepository.findById(request.partTemplateId())
+                .orElseThrow(() -> new SimvexException(GlobalErrorCode.PART_NOT_FOUND, "partTemplateId=" + request.partTemplateId()));
+
+        String modelUrl = s3Service.getPartModelUrl(partTemplate.getDrawingTemplate().getName(), partTemplate.getModelFileName());
+
+        Part newPart = Part.builder()
+                .name(partTemplate.getName())
+                .modelFileName(partTemplate.getModelFileName())
+                .project(project)
+                .coordinate(partTemplate.getCoordinateAttribute())
+                .rotation(partTemplate.getRotationAttribute())
+                .build();
+
+        partRepository.save(newPart);
+
+        return new ModelFetchResponse(partTemplate.getModelFileName(), modelUrl);
     }
 
-    private void validateProjectNameNotDuplicate(String projectId) {
-        if (projectRepository.existsByName(projectId)) {
-            throw new SimvexException(
-                    GlobalErrorCode.PROJECT_NAME_DUPLICATE,
-                    projectId
-            );
-        }
-    }
 
     @Transactional
     public ProjectStoreResponse storeProjectParts(

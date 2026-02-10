@@ -12,9 +12,6 @@ import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.UUID;
 
 @Slf4j
@@ -32,7 +29,7 @@ public class S3Service {
     @Value("${AWS_REGION}")
     private String region;
 
-    public String getDrawingUrl(String drawing, String fileName) {
+    public String getPartModelUrl(String drawing, String fileName) {
         return "https://" +
                 bucket +
                 ".s3." +

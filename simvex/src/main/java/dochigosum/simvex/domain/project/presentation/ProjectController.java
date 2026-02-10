@@ -20,35 +20,35 @@ public class ProjectController {
 
     private final ProjectService projectService;
 
+    // 프로젝트 생성
     @PostMapping
-    public ResponseEntity<ProjectResponse> createProject(
+    public ResponseEntity<Void> createProject(
+            @AuthenticationPrincipal Long memberId,
             @Valid @RequestBody ProjectCreateRequest request
     ) {
-        ProjectResponse response = projectService.createProject(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        projectService.createProject(memberId, request);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @GetMapping("/{projectId}")
+    @GetMapping
+    public ResponseEntity<List<ProjectsResponse>> getProjects(
+            @AuthenticationPrincipal Long memberId
+    ) {
+        return ResponseEntity.ok(projectService.getProjects(memberId));
+    }
+
+    @GetMapping("/{projectId}/detail")
     public ResponseEntity<ProjectDetailResponse> getProjectDetail(
             @PathVariable Long projectId
     ) {
         ProjectDetailResponse response = projectService
-                .getProjectDetailById(projectId);
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/{projectId}/detail")
-    public ResponseEntity<ProjectDetailResponse> getProjectDetailByName(
-            @PathVariable String projectId
-    ) {
-        ProjectDetailResponse response = projectService
-                .getProjectDetailByName(projectId);
+                .getProjectDetail(projectId);
         return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/{projectId}/rename")
     public ResponseEntity<ProjectDetailResponse> renameProject(
-            @PathVariable String projectId,
+            @PathVariable Long projectId,
             @Valid @RequestBody ProjectRenameRequest request
     ) {
         ProjectDetailResponse response = projectService
@@ -58,7 +58,7 @@ public class ProjectController {
 
     @DeleteMapping("/{projectId}/delete")
     public ResponseEntity<ProjectDeleteResponse> deleteProject(
-            @PathVariable String projectId
+            @PathVariable Long projectId
     ) {
         ProjectDeleteResponse response = projectService
                 .deleteProject(projectId);
@@ -75,5 +75,13 @@ public class ProjectController {
                 projectId, requests, saveImage
         );
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/{projectId}/parts")
+    public ResponseEntity<PartAddRequest> fetchModelInfo(
+            @PathVariable Long projectId,
+            @RequestPart PartAddRequest request
+    ) {
+        return ResponseEntity.ok(projectService.fetchModelInfo(projectId, request);
     }
 }

@@ -47,7 +47,7 @@ public class DrawingService {
         return drawingPartRepository.findAllByDrawing_Id(drawingId)
                 .stream()
                 .map(part -> {
-                    String url = s3Service.getDrawingUrl(part.getDrawing().getName(), part.getModelFileName());
+                    String url = s3Service.getDrawingPreviewImgUrl(part.getModelFileName());
                     return DrawingPartsResponse.from(part, url);
                 })
                 .toList();
@@ -59,7 +59,7 @@ public class DrawingService {
 
         return parts.stream()
                 .map(part -> {
-                    String url = s3Service.getDrawingUrl(part.getDrawing().getName(), part.getModelFileName());
+                    String url = s3Service.getDrawingPreviewImgUrl(part.getModelFileName());
                     return PartsModelResponse.from(part, url);
                 })
                 .toList();
@@ -75,7 +75,7 @@ public class DrawingService {
     public PartModelUrlResponse getModelUrl(Long partId) {
         DrawingPart part = drawingPartRepository.findById(partId)
                 .orElseThrow(() -> new SimvexException(DrawingErrorCode.NOT_FOUND));
-        return PartModelUrlResponse.of(s3Service.getDrawingUrl(part.getDrawing().getName(), part.getModelFileName()));
+        return PartModelUrlResponse.of(s3Service.getDrawingPreviewImgUrl(part.getModelFileName()));
     }
 
     @Transactional
@@ -87,7 +87,7 @@ public class DrawingService {
 
         return parts.stream()
                 .map(part -> {
-                    String url = s3Service.getDrawingUrl(drawing.getName(), part.getModelFileName());
+                    String url = s3Service.getDrawingPreviewImgUrl(part.getModelFileName());
                     return DrawingAssetResponse.of(part, url);
                 })
                 .toList();
