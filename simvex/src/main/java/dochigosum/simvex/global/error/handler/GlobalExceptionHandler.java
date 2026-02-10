@@ -3,7 +3,9 @@ package dochigosum.simvex.global.error.handler;
 import dochigosum.simvex.global.error.ErrorResponse;
 import dochigosum.simvex.global.error.GlobalErrorCode;
 import dochigosum.simvex.global.error.exception.SimvexException;
+import dochigosum.simvex.global.feignclient.webhook.SendService;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -22,12 +24,16 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @RestControllerAdvice
+@RequiredArgsConstructor
 public class GlobalExceptionHandler {
+    private final SendService sendService;
 
     @ExceptionHandler(SimvexException.class)
     public ResponseEntity<ErrorResponse> handleSimvexException(SimvexException e, HttpServletRequest request) {
         var ec = e.getErrorCode();
         String message = e.getMessage() != null ? e.getMessage() : ec.getMessage();
+
+        sendService.sendDiscordAlert(e, request.getMethod(), request.getRequestURI());
 
         return ResponseEntity
                 .status(ec.getStatus())
@@ -78,6 +84,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleUnexpected(Exception e, HttpServletRequest request) {
         // 서버 로그에만 스택 트레이스 남기고, 응답은 안전하게
         log.error("Unexpected exception: {} {}", request.getMethod(), request.getRequestURI(), e);
+        sendService.sendDiscordAlert(e, request.getMethod(), request.getRequestURI());
 
         return ResponseEntity
                 .status(GlobalErrorCode.INTERNAL_SERVER_ERROR.getStatus())

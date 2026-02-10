@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/memo")
+@RequestMapping("/api/v1/memo")
 public class MemoController {
 
     private final MemoService memoService;
