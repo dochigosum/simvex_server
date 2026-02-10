@@ -6,11 +6,14 @@ import dochigosum.simvex.domain.drawing.entity.DrawingPart;
 import dochigosum.simvex.domain.drawing.exception.DrawingErrorCode;
 import dochigosum.simvex.domain.drawing.presentation.dto.response.DrawingAssetResponse;
 import dochigosum.simvex.domain.drawing.presentation.dto.response.*;
-import dochigosum.simvex.domain.drawing.repository.ConversationRepository;
 import dochigosum.simvex.domain.drawing.repository.DrawingPartRepository;
 import dochigosum.simvex.domain.drawing.repository.DrawingRepository;
 import dochigosum.simvex.domain.member.entity.Member;
 import dochigosum.simvex.domain.member.repository.MemberRepository;
+import dochigosum.simvex.domain.template.entity.DrawingTemplate;
+import dochigosum.simvex.domain.template.entity.PartTemplate;
+import dochigosum.simvex.domain.template.repository.DrawingTemplateRepository;
+import dochigosum.simvex.domain.template.repository.PartTemplateRepository;
 import dochigosum.simvex.global.error.exception.SimvexException;
 import dochigosum.simvex.global.s3.S3Service;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +30,9 @@ public class DrawingService {
     private final DrawingRepository drawingRepository;
     private final DrawingPartRepository drawingPartRepository;
     private final MemberRepository memberRepository;
+    private final DrawingTemplateRepository drawingTemplateRepository;
+    private final PartTemplateRepository partTemplateRepository;
+
     private final S3Service s3Service;
 
     // 조립도 정보 반환
@@ -41,7 +47,7 @@ public class DrawingService {
         return drawingPartRepository.findAllByDrawing_Id(drawingId)
                 .stream()
                 .map(part -> {
-                    String url = s3Service.getDrawingUrl(part.getDrawing().getName(), part.getFileName());
+                    String url = s3Service.getDrawingUrl(part.getDrawing().getName(), part.getModelFileName());
                     return DrawingPartsResponse.from(part, url);
                 })
                 .toList();
@@ -53,7 +59,7 @@ public class DrawingService {
 
         return parts.stream()
                 .map(part -> {
-                    String url = s3Service.getDrawingUrl(part.getDrawing().getName(), part.getFileName());
+                    String url = s3Service.getDrawingUrl(part.getDrawing().getName(), part.getModelFileName());
                     return PartsModelResponse.from(part, url);
                 })
                 .toList();
@@ -69,7 +75,7 @@ public class DrawingService {
     public PartModelUrlResponse getModelUrl(Long partId) {
         DrawingPart part = drawingPartRepository.findById(partId)
                 .orElseThrow(() -> new SimvexException(DrawingErrorCode.NOT_FOUND));
-        return PartModelUrlResponse.of(s3Service.getDrawingUrl(part.getDrawing().getName(), part.getFileName()));
+        return PartModelUrlResponse.of(s3Service.getDrawingUrl(part.getDrawing().getName(), part.getModelFileName()));
     }
 
     @Transactional
@@ -81,27 +87,26 @@ public class DrawingService {
 
         return parts.stream()
                 .map(part -> {
-                    String url = s3Service.getDrawingUrl(drawing.getName(), part.getFileName());
+                    String url = s3Service.getDrawingUrl(drawing.getName(), part.getModelFileName());
                     return DrawingAssetResponse.of(part, url);
                 })
                 .toList();
     }
 
-    // todo: 이후 연결
     @Transactional
     public void createDrawingSession(Long templateId, Long userId) {
         DrawingTemplate drawingTemplate = drawingTemplateRepository.findById(templateId)
                 .orElseThrow(() -> new SimvexException(DrawingErrorCode.NOT_FOUND));
 
-        DrawingPartTemplate partTemplate = drawingPartTemplateRepository.findById(templateId)
-                .orElseThrow(() -> new SimvexException(DrawingErrorCode.NOT_FOUND));
+        List<PartTemplate> partTemplates = partTemplateRepository.findAllByDrawingTemplate_Id(templateId);
 
         Member member = memberRepository.getReferenceById(userId);
 
         Drawing newDrawing = Drawing.builder()
                 .member(member)
                 .name(drawingTemplate.getName())
-                .previewImgUrl(drawingTemplate.getPreviewImgUrl())
+                .detail(drawingTemplate.getDetail())
+                .previewImg(drawingTemplate.getPreviewImg())
                 .build();
 
         Conversation conversation = Conversation.builder()
@@ -109,11 +114,11 @@ public class DrawingService {
                 .build();
         newDrawing.addConversation(conversation);
 
-        partTemplate.forEach(tp -> {
+        partTemplates.forEach(tp -> {
             DrawingPart part = DrawingPart.builder()
                     .name(tp.getName())
                     .detail(tp.getDetail())
-                    .fileName(tp.getFileName())
+                    .modelFileName(tp.getModelFileName())
                     .xCoordinate(tp.getXCoordinate())
                     .yCoordinate(tp.getYCoordinate())
                     .zCoordinate(tp.getZCoordinate())

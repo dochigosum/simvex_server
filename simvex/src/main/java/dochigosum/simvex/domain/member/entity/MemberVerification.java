@@ -1,6 +1,5 @@
-package dochigosum.simvex.domain.memberverifications.entity;
+package dochigosum.simvex.domain.member.entity;
 
-import dochigosum.simvex.domain.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;
 

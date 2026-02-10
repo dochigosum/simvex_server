@@ -24,7 +24,7 @@ public class DrawingPart {
     private String detail;
 
     @Column(nullable = false, length = 50)
-    private String fileName;
+    private String modelFileName;
 
     private Integer xCoordinate;
     private Integer yCoordinate;
@@ -38,7 +38,7 @@ public class DrawingPart {
     private DrawingPart(
             String name,
             String detail,
-            String fileName,
+            String modelFileName,
             Integer xCoordinate,
             Integer yCoordinate,
             Integer zCoordinate,
@@ -48,7 +48,7 @@ public class DrawingPart {
     ) {
         this.name = name;
         this.detail = detail;
-        this.fileName = fileName;
+        this.modelFileName = modelFileName;
         this.xCoordinate = xCoordinate;
         this.yCoordinate = yCoordinate;
         this.zCoordinate = zCoordinate;

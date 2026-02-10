@@ -17,8 +17,19 @@ public class PartTemplate {
     @Column(nullable = false, length = 50)
     private String name;
 
+    @Column(nullable = false, length = 2000)
+    private String detail;
+
     @Column(nullable = false, length = 255)
-    private String fileName;
+    private String modelFileName;
+
+    private Integer xCoordinate;
+    private Integer yCoordinate;
+    private Integer zCoordinate;
+
+    private Integer xRotation;
+    private Integer yRotation;
+    private Integer zRotation;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "drawing_id")
