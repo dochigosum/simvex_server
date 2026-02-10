@@ -40,7 +40,10 @@ public class DrawingService {
     public List<DrawingPartsResponse> getParts(Long drawingId) {
         return drawingPartRepository.findAllByDrawing_Id(drawingId)
                 .stream()
-                .map(DrawingPartsResponse::from)
+                .map(part -> {
+                    String url = s3Service.getDrawingUrl(part.getDrawing().getName(), part.getFileName());
+                    return DrawingPartsResponse.from(part, url);
+                })
                 .toList();
     }
 

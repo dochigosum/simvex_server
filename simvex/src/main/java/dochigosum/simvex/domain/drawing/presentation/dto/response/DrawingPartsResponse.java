@@ -11,11 +11,11 @@ public record DrawingPartsResponse(
         return new DrawingPartsResponse(partId, partName, partModelUrl);
     }
 
-    public static DrawingPartsResponse from(DrawingPart part) {
+    public static DrawingPartsResponse from(DrawingPart part, String url) {
         return new DrawingPartsResponse(
                 part.getId(),
                 part.getName(),
-                part.getFileName()
+                url
         );
     }
 }
