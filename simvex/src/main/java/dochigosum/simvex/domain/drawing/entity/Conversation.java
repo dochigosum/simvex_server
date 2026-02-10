@@ -15,7 +15,7 @@ public class Conversation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(mappedBy = "drawing")
+    @OneToOne(mappedBy = "conversation")
     private Drawing drawing;
 
     @Column(length = 2000)

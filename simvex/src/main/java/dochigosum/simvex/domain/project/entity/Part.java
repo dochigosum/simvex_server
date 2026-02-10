@@ -33,6 +33,10 @@ public class Part {
     @Embedded
     private RotationAttribute rotation;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "project_id")
+    private Project project;
+
     @Builder
     public Part(Long projectId, String name, String modelFileName,
                 CoordinateAttribute coordinate, RotationAttribute rotation) {

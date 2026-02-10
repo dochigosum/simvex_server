@@ -1,6 +1,5 @@
 package dochigosum.simvex.domain.project.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dochigosum.simvex.domain.common.CoordinateAttribute;
 import dochigosum.simvex.domain.common.RotationAttribute;
@@ -12,11 +11,13 @@ import dochigosum.simvex.domain.project.repository.PartRepository;
 import dochigosum.simvex.domain.project.repository.ProjectRepository;
 import dochigosum.simvex.global.error.GlobalErrorCode;
 import dochigosum.simvex.global.error.exception.SimvexException;
+import dochigosum.simvex.global.s3.S3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -27,7 +28,7 @@ public class ProjectService {
     private final PartRepository partRepository;
     private final ProjectRedisService projectRedisService;
     private final ObjectMapper objectMapper;
-    private final ProjectS3Service projectS3Service;
+    private final S3Service s3Service;
 
     @Transactional
     public ProjectResponse createProject(ProjectCreateRequest request) {
@@ -43,8 +44,8 @@ public class ProjectService {
         return ProjectResponse.from(savedProject);
     }
 
-    public ProjectListResponse getProjectsByUserId(Long userId) {
-        List<Project> projects = projectRepository.findByUserId(userId);
+    public ProjectListResponse getProjects(Long memberId) {
+        List<Project> projects = projectRepository.findByMemberId(memberId);
 
         List<ProjectResponse> projectResponses = projects.stream()
                 .map(ProjectResponse::from)
@@ -109,65 +110,41 @@ public class ProjectService {
 
     @Transactional
     public ProjectStoreResponse storeProjectParts(
-            String projectName,
-            String partInfoJson,
-            MultipartFile saveImage,
-            boolean persistToDb
-    ) {
-        Project project = findProjectByName(projectName);
-        List<PartStoreRequest> partRequests = parsePartInfo(partInfoJson);
-
-        // Redis에 항상 저장
-        projectRedisService.savePartsToRedis(project.getId(), partRequests);
-
-        // MySQL 저장 및 이미지 업로드
-        if (persistToDb && saveImage != null && !saveImage.isEmpty()) {
-            savePersistentData(project, partRequests, saveImage);
-        }
-
-        return ProjectStoreResponse.of(projectName);
-    }
-
-    private List<PartStoreRequest> parsePartInfo(String partInfoJson) {
-        try {
-            return objectMapper.readValue(partInfoJson,
-                    objectMapper.getTypeFactory()
-                            .constructCollectionType(List.class,
-                                    PartStoreRequest.class));
-        } catch (JsonProcessingException e) {
-            throw new SimvexException(GlobalErrorCode.INVALID_PART_DATA);
-        }
-    }
-
-    private void savePersistentData(
-            Project project,
-            List<PartStoreRequest> partRequests,
+            Long projectId,
+            List<PartStoreRequest> requests,
             MultipartFile saveImage
     ) {
-        // 기존 부품 삭제
-        partRepository.deleteByProjectId(project.getId());
+        Project project = findProjectById(projectId);
 
-        // 새 부품 저장
-        List<Part> parts = partRequests.stream()
-                .map(req -> Part.builder()
-                        .projectId(project.getId())
-                        .coordinate(CoordinateAttribute.of(
-                                req.xCoordinate(),
-                                req.yCoordinate(),
-                                req.zCoordinate()
-                        ))
-                        .rotation(RotationAttribute.of(
-                                req.xRotation(),
-                                req.yRotation(),
-                                req.zRotation()
-                        ))
-                        .build())
-                .toList();
+        if (saveImage != null && !saveImage.isEmpty()) {
+            // MySQL 저장 + S3 이미지 업로드
+            return saveToMySqlWithImage(projectId, requests, saveImage);
+        }
 
-        partRepository.saveAll(parts);
+        // Redis에 항상 저장
+        projectRedisService.savePartsToRedis(project.getId(), requests);
+        return ProjectStoreResponse.of(project.getName());
+    }
 
-        // S3에 이미지 업로드 및 업데이트
-        String imageUrl = projectS3Service.uploadImage(saveImage, project.getName());
+    private ProjectStoreResponse saveToMySqlWithImage(Long projectId, List<PartStoreRequest> partInfo, MultipartFile saveImage) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new SimvexException(GlobalErrorCode.PROJECT_NOT_FOUND, "Project ID: " + projectId));
+
+        // 1. S3 이미지 업로드 및 URL 갱신
+        String imageUrl = s3Service.uploadProjectPreviewImg(project.getMemberId(), project.getName(), saveImage);
         project.updatePreviewImage(imageUrl);
+
+        // 2. 부품 위치 업데이트 (기존에 만든 updateTransform 활용)
+        project.getParts().forEach(part -> {
+            partInfo.stream()
+                    .filter(req -> req.id().equals(part.getId()))
+                    .findFirst()
+                    .ifPresent(req -> part.updateTransform(
+                            CoordinateAttribute.of(req.xCoordinate(), req.yCoordinate(), req.zCoordinate()),
+                            RotationAttribute.of(req.xRotation(), req.yRotation(), req.zRotation())
+                    ));
+        });
+
+        return new ProjectStoreResponse("Project saved successfully to MySQL", LocalDateTime.now());
     }
 }

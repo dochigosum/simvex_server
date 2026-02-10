@@ -7,8 +7,10 @@ public record ProjectStoreResponse(
         LocalDateTime savedAt
 ) {
     public static ProjectStoreResponse of(String projectName) {
+        String message = "Project '" + projectName + "' saved successfully";
+
         return new ProjectStoreResponse(
-                String.format("Project '%s' saved successfully", projectName),
+                message,
                 LocalDateTime.now()
         );
     }

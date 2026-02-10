@@ -27,8 +27,7 @@ public class ProjectRedisService {
     public void savePartsToRedis(Long projectId, List<PartStoreRequest> parts) {
         String key = PART_KEY_PREFIX + projectId;
         try {
-            String jsonValue = objectMapper.writeValueAsString(parts);
-            redisTemplate.opsForValue().set(key, jsonValue, TTL);
+            redisTemplate.opsForValue().set(key, objectMapper.writeValueAsString(parts), TTL);
             log.info("Parts saved to Redis for project: {}", projectId);
         } catch (JsonProcessingException e) {
             throw new SimvexException(GlobalErrorCode.INVALID_PART_DATA);

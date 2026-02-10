@@ -7,8 +7,11 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/project")
@@ -64,13 +67,12 @@ public class ProjectController {
 
     @PutMapping("/{projectId}/store")
     public ResponseEntity<ProjectStoreResponse> storeProject(
-            @PathVariable String projectId,
-            @RequestPart("partInfo") String partInfo,
-            @RequestPart(value = "saveImage", required = false) MultipartFile saveImage,
-            @RequestParam(defaultValue = "false") boolean persistToDb
+            @PathVariable Long projectId,
+            @RequestPart("partInfo") List<PartStoreRequest> requests,
+            @RequestPart(value = "saveImage", required = false) MultipartFile saveImage
     ) {
         ProjectStoreResponse response = projectService.storeProjectParts(
-                projectId, partInfo, saveImage, persistToDb
+                projectId, requests, saveImage
         );
         return ResponseEntity.ok(response);
     }
